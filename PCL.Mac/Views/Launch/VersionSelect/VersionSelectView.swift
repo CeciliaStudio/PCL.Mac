@@ -77,33 +77,7 @@ struct VersionSelectView: View, SubRouteContainer {
                             panel.canChooseDirectories = false
                             
                             if panel.runModal() == .OK {
-                                if case .failure(let error) = ModrinthModpackImporter.checkModpack(panel.url!) {
-                                    switch error {
-                                    case .zipFormatError:
-                                        PopupManager.shared.show(.init(.error, "无法导入整合包", "该整合包不是一个有效的压缩包！", [.ok]))
-                                    case .unsupported:
-                                        PopupManager.shared.show(.init(.error, "无法导入整合包", "很抱歉，PCL.Mac 暂时只支持导入 Modrinth 整合包……\n你可以使用其它启动器导入，然后把实例文件夹拖入本页面的右侧。", [.ok]))
-                                    }
-                                    return
-                                }
-                                
-                                do {
-                                    let importer = try ModrinthModpackImporter(minecraftDirectory: settings.currentMinecraftDirectory.unwrap(), modpackURL: panel.url!)
-                                    let index = try importer.loadIndex()
-                                    let tasks = try importer.createInstallTasks()
-                                    dataManager.inprogressInstallTasks = tasks
-                                    tasks.startAll { result in
-                                        switch result {
-                                        case .success(_):
-                                            hint("整合包 \(index.name) 导入成功！", .finish)
-                                        case .failure(let failure):
-                                            PopupManager.shared.show(.init(.error, "导入整合包失败", "\(failure.localizedDescription)\n若要寻求帮助，请进入设置 > 其它 > 打开日志，将选中的文件发给别人，而不是发送此页面的照片或截图。", [.ok]))
-                                        }
-                                    }
-                                } catch {
-                                    err("创建导入任务失败: \(error.localizedDescription)")
-                                    PopupManager.shared.show(.init(.error, "无法创建导入任务", "\(error.localizedDescription)\n若要寻求帮助，请进入设置 > 其它 > 打开日志，将选中的文件发给别人，而不是发送本页面的照片或截图。", [.ok]))
-                                }
+                                importModpack(panel.url!)
                             }
                         }
                     Spacer()
@@ -144,6 +118,36 @@ struct VersionSelectView: View, SubRouteContainer {
             )
         }
         return AnyView(EmptyView())
+    }
+    
+    private func importModpack(_ url: URL) {
+        if case .failure(let error) = ModrinthModpackImporter.checkModpack(url) {
+            switch error {
+            case .zipFormatError:
+                PopupManager.shared.show(.init(.error, "无法导入整合包", "该整合包不是一个有效的压缩包！", [.ok]))
+            case .unsupported:
+                PopupManager.shared.show(.init(.error, "无法导入整合包", "很抱歉，PCL.Mac 暂时只支持导入 Modrinth 整合包……\n你可以使用其它启动器导入，然后把实例文件夹拖入本页面的右侧。", [.ok]))
+            }
+            return
+        }
+        
+        do {
+            let importer = try ModrinthModpackImporter(minecraftDirectory: settings.currentMinecraftDirectory.unwrap(), modpackURL: url)
+            let index = try importer.loadIndex()
+            let tasks = try importer.createInstallTasks()
+            dataManager.inprogressInstallTasks = tasks
+            tasks.startAll { result in
+                switch result {
+                case .success(_):
+                    hint("整合包 \(index.name) 导入成功！", .finish)
+                case .failure(let failure):
+                    PopupManager.shared.show(.init(.error, "导入整合包失败", "\(failure.localizedDescription)\n若要寻求帮助，请进入设置 > 其它 > 打开日志，将选中的文件发给别人，而不是发送此页面的照片或截图。", [.ok]))
+                }
+            }
+        } catch {
+            err("创建导入任务失败: \(error.localizedDescription)")
+            PopupManager.shared.show(.init(.error, "无法创建导入任务", "\(error.localizedDescription)\n若要寻求帮助，请进入设置 > 其它 > 打开日志，将选中的文件发给别人，而不是发送本页面的照片或截图。", [.ok]))
+        }
     }
 }
 
