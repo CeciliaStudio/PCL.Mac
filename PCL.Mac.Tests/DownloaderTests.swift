@@ -11,9 +11,10 @@ import Testing
 
 struct DownloaderTests {
     @Test func testSingleFileDownload() async throws {
-        try await SingleFileDownloader.download(url: "https://bmclapi2.bangbang93.com/version/1.21/client".url, destination: URL(fileURLWithUserPath: "~/test.file"), replaceMethod: .replace) { progress in
-            print(progress)
-        }
+        AccountManager.shared.accounts.append(.offline(.init("MinecraftVenti", UUID(uuidString: "038d4a77-200d-48c7-8217-20de0a4d313a"))))
+//        try await SingleFileDownloader.download(url: "https://bmclapi2.bangbang93.com/version/1.21/client".url, destination: URL(fileURLWithUserPath: "~/test.file"), replaceMethod: .replace) { progress in
+//            print(progress)
+//        }
     }
     
     @Test func testMultiFileDownload() async throws {

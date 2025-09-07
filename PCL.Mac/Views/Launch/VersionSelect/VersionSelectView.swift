@@ -89,12 +89,13 @@ struct VersionSelectView: View, SubRouteContainer {
                                 
                                 do {
                                     let importer = try ModrinthModpackImporter(minecraftDirectory: settings.currentMinecraftDirectory.unwrap(), modpackURL: panel.url!)
+                                    let index = try importer.loadIndex()
                                     let tasks = try importer.createInstallTasks()
                                     dataManager.inprogressInstallTasks = tasks
                                     tasks.startAll { result in
                                         switch result {
                                         case .success(_):
-                                            hint("整合包 {placeholder} 导入成功！")
+                                            hint("整合包 \(index.name) 导入成功！", .finish)
                                         case .failure(let failure):
                                             PopupManager.shared.show(.init(.error, "导入整合包失败", "\(failure.localizedDescription)\n若要寻求帮助，请进入设置 > 其它 > 打开日志，将选中的文件发给别人，而不是发送此页面的照片或截图。", [.ok]))
                                         }

@@ -196,10 +196,13 @@ class VersionDropDelegate: DropDelegate {
                         hint("请拖入正确的 Minecraft 版本文件夹！", .critical)
                         return
                     }
+                    guard let directory = AppSettings.shared.currentMinecraftDirectory else {
+                        return
+                    }
                     
                     hint("正在导入实例 \(url.lastPathComponent)……")
                     Task {
-                        let dest = URL(fileURLWithUserPath: "~/PCL-Mac-minecraft/versions/\(url.lastPathComponent)")
+                        let dest = directory.versionsURL.appending(path: url.lastPathComponent)
                         if FileManager.default.fileExists(atPath: dest.path) {
                             hint("已存在同名实例！", .critical)
                             return

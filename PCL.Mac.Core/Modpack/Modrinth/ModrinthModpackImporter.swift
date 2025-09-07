@@ -12,10 +12,19 @@ import SwiftyJSON
 public class ModrinthModpackImporter {
     private let minecraftDirectory: MinecraftDirectory
     private let modpackURL: URL
+    private var index: ModrinthModpackIndex?
     
-    public init(minecraftDirectory: MinecraftDirectory, modpackURL: URL) {
+    public init(minecraftDirectory: MinecraftDirectory, modpackURL: URL) throws {
         self.minecraftDirectory = minecraftDirectory
         self.modpackURL = modpackURL
+    }
+    
+    public func loadIndex() throws -> ModrinthModpackIndex {
+        if let index { return index }
+        let data = try ArchiveUtil.getEntryOrThrow(url: modpackURL, name: "modrinth.index.json")
+        let json = try JSON(data: data)
+        index = ModrinthModpackIndex(json: json)
+        return index!
     }
     
     public func createInstallTasks() throws -> InstallTasks {
