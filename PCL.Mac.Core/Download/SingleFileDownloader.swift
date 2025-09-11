@@ -105,8 +105,8 @@ public class SingleFileDownloader {
             }
         } else {
             try? FileManager.default.createDirectory(at: destination.parent(), withIntermediateDirectories: true)
-            try FileManager.default.moveItem(at: tempURL, to: destination)
         }
+        try FileManager.default.moveItem(at: tempURL, to: destination)
         
         if let cacheStorage, let response = response as? HTTPURLResponse,
            let eTag = response.value(forHTTPHeaderField: "ETag"), let lastModified = response.value(forHTTPHeaderField: "Last-Modified") {

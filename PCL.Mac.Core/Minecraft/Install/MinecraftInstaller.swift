@@ -246,7 +246,8 @@ public class MinecraftInstaller {
         return totalFiles - 2
     }
     
-    // MARK: 补全实例资源文件
+    /// 为实例补全资源文件。
+    /// - Parameter instance: 目标实例。
     public static func completeResources(_ instance: MinecraftInstance) async throws {
         let arch: Architecture
         if Architecture.system == .x64 { arch = .x64 }

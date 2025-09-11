@@ -46,6 +46,7 @@ struct DownloadPage: View {
                                 .onChange(of: name) {
                                     checkName()
                                 }
+                                .onAppear(perform: checkName)
                             if !errorMessage.isEmpty {
                                 Text(errorMessage)
                                     .foregroundStyle(Color(hex: 0xFF4C4C))
@@ -153,6 +154,9 @@ struct DownloadPage: View {
             errorMessage = "带 Mod 加载器的实例名不能与版本号一致！"
         } else if name.isEmpty {
             errorMessage = "实例名不能为空！"
+        } else if let directory = AppSettings.shared.currentMinecraftDirectory,
+                  FileManager.default.fileExists(atPath: directory.versionsURL.appending(path: name).path) {
+            errorMessage = "已有同名实例！"
         } else {
             errorMessage = ""
         }
