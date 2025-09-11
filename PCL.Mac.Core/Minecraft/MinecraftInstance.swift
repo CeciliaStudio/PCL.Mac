@@ -188,8 +188,7 @@ public class MinecraftInstance: Identifiable, Equatable, Hashable {
         
         if !config.skipResourcesCheck && !launchOptions.skipResourceCheck {
             log("正在进行资源完整性检查")
-            let task = MinecraftInstaller.createCompleteTask(self)
-            try? await task.start()
+            try? await MinecraftInstaller.completeResources(self)
             log("资源完整性检查完成")
         }
         

@@ -29,10 +29,14 @@ public struct ArtifactVersionMapper {
             switch library.groupId {
             case "org.lwjgl":
                 if library.version.starts(with: "3.") && library.version != "3.3.3" {
-                    changeVersion(library, "3.3.2")
+                    if library.artifactId == "lwjgl-glfw" {
+                        library.name = "org.glavo.hmcl.mmachina:lwjgl-glfw:3.3.1-mmachina.1"
+                        library.artifact?.url = "https://bmclapi2.bangbang93.com/maven/\(Util.toPath(mavenCoordinate: library.name))"
+                    } else {
+                        changeVersion(library, "3.3.1")
+                        library.artifact?.url = "https://libraries.minecraft.net/\(Util.toPath(mavenCoordinate: library.name))"
+                    }
                 }
-                library.artifact?.url = "https://libraries.minecraft.net/\(Util.toPath(mavenCoordinate: library.name))"
-            
             case "net.java.dev.jna":
                 if library.version == "4.4.0" {
                     changeVersion(library, "5.14.0")
@@ -55,9 +59,9 @@ public struct ArtifactVersionMapper {
             switch library.groupId {
             case "org.lwjgl":
                 if library.version.starts(with: "3.") && library.version != "3.3.3" {
-                    changeVersion(library, "3.3.2")
+                    changeVersion(library, "3.3.1")
                 }
-                library.name = "org.lwjgl:\(library.artifactId):3.3.2:natives-macos-arm64"
+                library.name = "org.lwjgl:\(library.artifactId):3.3.1:natives-macos-arm64"
                 artifact.url = "https://libraries.minecraft.net/org/lwjgl/\(library.artifactId)/\(library.version)/\(library.artifactId)-\(library.version)-natives-macos-arm64.jar"
             case "org.lwjgl.lwjgl":
                 if library.artifactId == "lwjgl-platform" {
@@ -69,7 +73,7 @@ public struct ArtifactVersionMapper {
             case "ca.weblite":
                 if library.artifactId == "java-objc-bridge" {
                     library.name = "org.glavo.hmcl.mmachina:java-objc-bridge:1.1.0-mmachina.1"
-                    artifact.url = "https://repo1.maven.org/maven2/org/glavo/hmcl/mmachina/java-objc-bridge/1.1.0-mmachina.1/java-objc-bridge-1.1.0-mmachina.1.jar"
+                    artifact.url = "https://bmclapi2.bangbang93.com/maven/org/glavo/hmcl/mmachina/java-objc-bridge/1.1.0-mmachina.1/java-objc-bridge-1.1.0-mmachina.1.jar"
                     artifact.path = "org/glavo/hmcl/mmachina/java-objc-bridge/1.1.0-mmachina.1/java-objc-bridge-1.1.0-mmachina.1.jar"
                     continue
                 }

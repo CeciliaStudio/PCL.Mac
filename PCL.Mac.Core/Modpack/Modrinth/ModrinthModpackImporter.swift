@@ -55,10 +55,10 @@ public class ModrinthModpackImporter {
             let installTasks = InstallTasks.empty()
             
             // 添加 Minecraft 安装任务
-            let minecraftInstallTask = MinecraftInstaller.createTask(
-                index.dependencies.minecraftVerison,
-                index.name,
-                minecraftDirectory
+            let minecraftInstallTask = MinecraftInstallTask(
+                instanceURL: instanceURL,
+                version: index.dependencies.minecraftVerison,
+                minecraftDirectory: minecraftDirectory
             )
             installTasks.addTask(key: "minecraft", task: minecraftInstallTask)
             

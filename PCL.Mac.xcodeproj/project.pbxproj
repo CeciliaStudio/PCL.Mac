@@ -16,7 +16,6 @@
 		EC4E6C802E438E6600F0871D /* daemon in Resources */ = {isa = PBXBuildFile; fileRef = EC4E6C7F2E438E6600F0871D /* daemon */; };
 		EC9507372DFCF17700018EE0 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = EC9507362DFCF17700018EE0 /* SwiftyJSON */; };
 		EC98618D2E3E09DC00C0E6F2 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = EC98618C2E3E09DC00C0E6F2 /* SwiftyJSON */; };
-		EC9A7DCA2DE150170018815F /* glfw-patcher.jar in Resources */ = {isa = PBXBuildFile; fileRef = EC9A7DC82DE1500F0018815F /* glfw-patcher.jar */; };
 		ECDBF0CC2E1124C500E81482 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = ECDBF0CB2E1124C500E81482 /* ZIPFoundation */; };
 		ECFF69BD2E542EE8000625FA /* TOMLKit in Frameworks */ = {isa = PBXBuildFile; productRef = ECFF69BC2E542EE8000625FA /* TOMLKit */; };
 		ECFF69BF2E542EFF000625FA /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = ECFF69BE2E542EFF000625FA /* ZIPFoundation */; };
@@ -60,7 +59,6 @@
 		EC23B6322DE5DC5B00CBEA9C /* PCL.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = PCL.ttf; sourceTree = "<group>"; };
 		EC422DA32E2082D900FE8309 /* PCL_Mac_Core.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PCL_Mac_Core.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC4E6C7F2E438E6600F0871D /* daemon */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = daemon; sourceTree = "<group>"; };
-		EC9A7DC82DE1500F0018815F /* glfw-patcher.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = "glfw-patcher.jar"; sourceTree = "<group>"; };
 		EC9EAEC92DD85E48006CEDCC /* PCL.Mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PCL.Mac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ECA5D8DC2DD99A4C006C58F7 /* PCL.Mac.Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PCL.Mac.Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -78,13 +76,13 @@
 				Java/JavaDownloader.swift,
 				Java/JavaSearch.swift,
 				LogManager.swift,
-				Minecraft/AssetIndex.swift,
 				Minecraft/ClientManifest.swift,
-				Minecraft/Download/ArtifactVersionMapper.swift,
-				Minecraft/Download/InstallTask.swift,
-				Minecraft/Download/MinecraftInstaller.swift,
-				Minecraft/Download/MinecraftInstallTask.swift,
-				Minecraft/Download/VersionManifest.swift,
+				Minecraft/Install/ArtifactVersionMapper.swift,
+				Minecraft/Install/AssetIndex.swift,
+				Minecraft/Install/InstallTask.swift,
+				Minecraft/Install/MinecraftInstaller.swift,
+				Minecraft/Install/MinecraftInstallTask.swift,
+				Minecraft/Install/VersionManifest.swift,
 				Minecraft/Launch/LaunchOptions.swift,
 				Minecraft/Launch/LaunchPrecheck.swift,
 				Minecraft/Launch/MinecraftLauncher.swift,
@@ -133,13 +131,13 @@
 				Java/JavaDownloader.swift,
 				Java/JavaSearch.swift,
 				LogManager.swift,
-				Minecraft/AssetIndex.swift,
 				Minecraft/ClientManifest.swift,
-				Minecraft/Download/ArtifactVersionMapper.swift,
-				Minecraft/Download/InstallTask.swift,
-				Minecraft/Download/MinecraftInstaller.swift,
-				Minecraft/Download/MinecraftInstallTask.swift,
-				Minecraft/Download/VersionManifest.swift,
+				Minecraft/Install/ArtifactVersionMapper.swift,
+				Minecraft/Install/AssetIndex.swift,
+				Minecraft/Install/InstallTask.swift,
+				Minecraft/Install/MinecraftInstaller.swift,
+				Minecraft/Install/MinecraftInstallTask.swift,
+				Minecraft/Install/VersionManifest.swift,
 				Minecraft/Launch/LaunchOptions.swift,
 				Minecraft/Launch/LaunchPrecheck.swift,
 				Minecraft/Launch/MinecraftLauncher.swift,
@@ -267,7 +265,6 @@
 			children = (
 				ECFAA4FE2E419A3200CE1E6E /* Themes */,
 				EC23B6322DE5DC5B00CBEA9C /* PCL.ttf */,
-				EC9A7DC82DE1500F0018815F /* glfw-patcher.jar */,
 				EC01E7E62DDC3BEA006EF529 /* log4j2.xml */,
 				EC01E7E72DDC3BEA006EF529 /* log4j2-1.12-.xml */,
 				EC4E6C7F2E438E6600F0871D /* daemon */,
@@ -457,7 +454,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EC9A7DCA2DE150170018815F /* glfw-patcher.jar in Resources */,
 				EC01E7E82DDC3BEA006EF529 /* log4j2.xml in Resources */,
 				EC23B6332DE5DC5B00CBEA9C /* PCL.ttf in Resources */,
 				EC4E6C802E438E6600F0871D /* daemon in Resources */,

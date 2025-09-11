@@ -20,7 +20,6 @@ struct DownloadPage: View {
         self.version = version
         self.name = version.displayName
         self.back = back
-        self.tasks.addTask(key: "minecraft", task: MinecraftInstaller.createTask(version, version.displayName, AppSettings.shared.currentMinecraftDirectory!))
     }
     
     var body: some View {
@@ -109,10 +108,11 @@ struct DownloadPage: View {
                         }
                         
                         if DataManager.shared.inprogressInstallTasks != nil { return }
+                        let directory = AppSettings.shared.currentMinecraftDirectory!
+                        let instanceURL = directory.versionsURL.appending(path: name)
                         
                         // 如果选择了加载器，添加加载器安装任务
                         if let loader {
-                            let instanceURL = AppSettings.shared.currentMinecraftDirectory!.versionsURL.appending(path: name)
                             let task: InstallTask? =
                             switch loader.loader {
                             case .fabric: FabricInstallTask(instanceURL: instanceURL, loaderVersion: loader.version)
@@ -123,9 +123,8 @@ struct DownloadPage: View {
                         }
                         
                         // 设置 MinecraftInstallTask 的实例名
-                        if let task = tasks.tasks["minecraft"] as? MinecraftInstallTask {
-                            task.name = self.name
-                        }
+                        let minecraftInstallTask = MinecraftInstallTask(instanceURL: instanceURL, version: version, minecraftDirectory: directory)
+                        tasks.addTask(key: "minecraft", task: minecraftInstallTask)
                         
                         // 切换到安装任务页面
                         DataManager.shared.inprogressInstallTasks = self.tasks

@@ -99,12 +99,15 @@ public class SingleFileDownloader {
                 try FileManager.default.removeItem(at: destination)
             } else if replaceMethod == .throw {
                 throw MyLocalizedError(reason: "\(destination.lastPathComponent) 已存在。")
+            } else if replaceMethod == .skip {
+                try FileManager.default.removeItem(at: tempURL)
+                return
             }
         } else {
             try? FileManager.default.createDirectory(at: destination.parent(), withIntermediateDirectories: true)
+            try FileManager.default.moveItem(at: tempURL, to: destination)
         }
         
-        try FileManager.default.moveItem(at: tempURL, to: destination)
         if let cacheStorage, let response = response as? HTTPURLResponse,
            let eTag = response.value(forHTTPHeaderField: "ETag"), let lastModified = response.value(forHTTPHeaderField: "Last-Modified") {
             cacheStorage.addFile(from: url, localURL: destination, eTag: eTag, lastModified: lastModified)
