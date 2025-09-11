@@ -63,7 +63,7 @@ fileprivate struct LeftTab: View {
                 .padding()
                 .padding(.bottom, -27)
             } else {
-                MyButton(text: "下载游戏", descriptionText: "未找到可用的游戏版本") {
+                MyButton(text: "下载游戏", descriptionText: "未找到可用的游戏实例") {
                     dataManager.router.setRoot(.download)
                 }
                 .frame(height: 55)
@@ -71,11 +71,11 @@ fileprivate struct LeftTab: View {
                 .padding(.bottom, -27)
             }
             HStack(spacing: 12) {
-                MyButton(text: "版本选择") {
+                MyButton(text: "实例选择") {
                     dataManager.router.append(.versionSelect)
                 }
                 if AppSettings.shared.defaultInstance != nil {
-                    MyButton(text: "版本设置") {
+                    MyButton(text: "实例设置") {
                         if let instance = self.instance {
                             dataManager.router.append(.versionSettings(instance: instance))
                         }
@@ -123,7 +123,7 @@ fileprivate struct LeftTab: View {
                 }
                 return false
             case .invalidMemoryConfiguration:
-                PopupManager.shared.show(.init(.error, "错误", "无效的内存配置：0MB。\n请在 版本设置 > 设置 中调整游戏内存配置", [.ok]))
+                PopupManager.shared.show(.init(.error, "错误", "无效的内存配置：0MB。\n请在 实例设置 > 设置 中调整游戏内存配置", [.ok]))
             case .rosetta:
                 if await PopupManager.shared.showAsync(.init(.normal, "警告", "你安装 / 选择了一个 x64 架构的 Java，需要通过转译运行，这将会损耗大部分性能。\n你可以进入 设置 > Java 管理，安装 / 选择一个 ARM64 架构的 Java。", [.init(label: "继续启动", style: .normal), .close]))
                 == 1 {

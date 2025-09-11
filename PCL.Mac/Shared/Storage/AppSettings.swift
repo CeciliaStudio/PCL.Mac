@@ -58,7 +58,7 @@ public class AppSettings: ObservableObject {
         }
     }
     
-    /// 启动时若为空自动设置为第一个版本
+    /// 启动时若为空自动设置为第一个实例
     @AppStorage("defaultInstance") public var defaultInstance: String?
     
     /// 配色方案

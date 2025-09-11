@@ -373,7 +373,7 @@ struct ProjectQueueOverlay: View {
                         .fixedSize()
                         MyButton(text: "开始", foregroundStyle: AppSettings.shared.theme.getTextStyle()) {
                             guard let instance = DataManager.shared.defaultInstance else {
-                                hint("请先在版本列表中选择一个实例！", .critical)
+                                hint("请先在实例列表中选择一个实例！", .critical)
                                 return
                             }
                             let versions = state.pendingDownloadProjects

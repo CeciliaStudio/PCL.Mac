@@ -73,8 +73,8 @@ struct VersionListView: View {
                 let result = await PopupManager.shared.showAsync(
                     PopupModel(
                         .normal,
-                        "删除版本",
-                        "确定要删除版本 \"\(instanceInfo.name)\" 吗？\n\n此操作将永久删除该版本的所有文件，包括模组、资源包等。\n真的很久！",
+                        "删除实例",
+                        "确定要删除实例 \"\(instanceInfo.name)\" 吗？\n\n此操作将永久删除该实例的所有文件，包括模组、资源包等。\n真的很久！",
                         [
                             PopupButtonModel(label: "取消", style: .normal),
                             PopupButtonModel(label: "删除", style: .danger)
@@ -87,10 +87,10 @@ struct VersionListView: View {
                         let versionName = instanceInfo.name
                         let runningDirectory = instanceInfo.runningDirectory
                         
-                        // 删除版本文件夹
+                        // 删除实例文件夹
                         try FileManager.default.removeItem(at: runningDirectory)
                         
-                        // 清理MinecraftInstance缓存
+                        // 清理 MinecraftInstance 缓存
                         MinecraftInstance.clearCache(for: runningDirectory)
                         
                         // 如果删除的是当前默认实例，清空默认实例设置
@@ -108,10 +108,10 @@ struct VersionListView: View {
                             DataManager.shared.router.path = [.versionSelect, .versionList(directory: instanceInfo.minecraftDirectory)]
                         }
                         
-                        hint("版本 \"\(versionName)\" 已删除", .finish)
+                        hint("实例 \"\(versionName)\" 已删除", .finish)
                     } catch {
-                        err("删除版本失败: \(error.localizedDescription)")
-                        hint("删除版本失败: \(error.localizedDescription)", .critical)
+                        err("删除实例失败: \(error.localizedDescription)")
+                        hint("删除实例失败: \(error.localizedDescription)", .critical)
                     }
                 }
             }
@@ -146,7 +146,7 @@ struct VersionListView: View {
                         .padding()
                     }
                     
-                    MyCard(index: 1, title: "常规版本") {
+                    MyCard(index: 1, title: "常规实例") {
                         LazyVStack {
                             ForEach(
                                 minecraftDirectory.instances
@@ -193,7 +193,7 @@ class VersionDropDelegate: DropDelegate {
                 
                 if let url = item as? URL, url.hasDirectoryPath {
                     guard FileManager.default.fileExists(atPath: url.appending(path: "\(url.lastPathComponent).json").path) else {
-                        hint("请拖入正确的 Minecraft 版本文件夹！", .critical)
+                        hint("请拖入正确的 Minecraft 实例文件夹！", .critical)
                         return
                     }
                     guard let directory = AppSettings.shared.currentMinecraftDirectory else {

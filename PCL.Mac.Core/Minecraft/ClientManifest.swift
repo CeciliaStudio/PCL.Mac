@@ -274,7 +274,7 @@ public class ClientManifest {
         let json = try JSON(data: data)
         
         if json["loader"].exists() && json["intermediary"].exists() && !json["id"].exists() { // 旧版 PCL.Mac Fabric 安装逻辑
-            warn("无法解析旧版 PCL.Mac 安装的 Fabric 版本: \(url.lastPathComponent)")
+            warn("无法解析旧版 PCL.Mac 安装的 Fabric 实例: \(url.lastPathComponent)")
             return nil
         }
         

@@ -75,7 +75,7 @@ public class MinecraftDirectory: Codable, Identifiable, Hashable {
                     DataManager.shared.objectWillChange.send()
                 }
             } catch {
-                err("读取版本目录失败: \(error.localizedDescription)")
+                err("读取实例目录失败: \(error.localizedDescription)")
             }
         }
     }

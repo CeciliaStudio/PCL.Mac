@@ -18,7 +18,7 @@ public class FabricInstaller {
     
     public static func installFabric(version: MinecraftVersion, minecraftDirectory: MinecraftDirectory, runningDirectory: URL, _ loaderVersion: String) async throws {
         let manifestURL = runningDirectory.appending(path: "\(runningDirectory.lastPathComponent).json")
-        // 若 inheritsFrom 对应的版本 JSON 不存在，复制
+        // 若 inheritsFrom 对应的实例 JSON 不存在，复制
         let baseManifestURL = minecraftDirectory.versionsURL.appending(path: version.displayName).appending(path: "\(version.displayName).json")
         if !FileManager.default.fileExists(atPath: baseManifestURL.path) {
             try? FileManager.default.createDirectory(at: baseManifestURL.parent(), withIntermediateDirectories: true)

@@ -70,11 +70,11 @@ public enum AppRoute: Hashable {
     var title: String {
         switch self {
         case .installing(_): "下载管理"
-        case .versionSelect, .versionList: "版本选择"
+        case .versionSelect, .versionList: "实例选择"
         case .projectDownload(let summary): "资源下载 - \(summary.name)"
         case .accountManagement, .accountList, .newAccount: "账号管理"
         case .announcementHistory: "历史公告"
-        case .versionSettings, .instanceOverview, .instanceSettings, .instanceMods: "版本设置 - \(AppSettings.shared.defaultInstance ?? "")"
+        case .versionSettings, .instanceOverview, .instanceSettings, .instanceMods: "实例设置 - \(AppSettings.shared.defaultInstance ?? "")"
         case .javaDownload: "Java 下载"
         case .themeUnlock: "主题解锁"
         default: "发现问题请在 https://github.com/CeciliaStudio/PCL.Mac/issues/new 上反馈！"
