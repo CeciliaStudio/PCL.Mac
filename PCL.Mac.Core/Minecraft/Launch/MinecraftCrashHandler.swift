@@ -11,26 +11,20 @@ import ZIPFoundation
 public class MinecraftCrashHandler {
     public static var lastLaunchCommand: String = "未设置"
     
-    public static func exportErrorReport(_ instance: MinecraftInstance, _ launcher: MinecraftLauncher, to destination: URL) {
+    public static func exportErrorReport(instance: MinecraftInstance, options: LaunchOptions, state: LaunchState, to destination: URL) {
         // MARK: - 输出环境信息
         log("以下是 PCL.Mac 检测到的环境信息:")
-        log("架构: \(Architecture.system)")
         log("分支: \(SharedConstants.shared.branch)")
+        log("========== 架构 ==========")
+        log("系统架构: \(Architecture.system)")
         log("Java 架构: \(Architecture.getArchOfFile(instance.config.javaURL!))")
-        
-        do {
-            let contents = try FileManager.default.contentsOfDirectory(
-                at: instance.runningDirectory.appending(path: "natives"),
-                includingPropertiesForKeys: nil
-            )
-            for fileURL in contents {
-                if fileURL.pathExtension != "dylib" { continue }
-                log("\(fileURL.lastPathComponent) 架构: \(Architecture.getArchOfFile(fileURL))")
-            }
-        } catch {
-            err("无法获取本地库: \(error.localizedDescription)")
-        }
-        
+        log("Rosetta: \(instance.isUsingRosetta ? "已启用" : "未启用")")
+        printNativesArchitecture(nativesDirectory: instance.runningDirectory.appending(path: "natives"))
+        log("========== 账号与其它 ==========")
+        log("账号类型: \(options.account!.authMethodName)")
+        log("跳过资源完整性检查: \(options.skipResourceCheck)")
+        log("试玩模式: \(options.isDemo)")
+        log("Java 路径: \(options.javaPath.path)")
         debug("正在导出错误报告")
         
         let tmp = TemperatureDirectory(name: "ErrorReport")
@@ -41,14 +35,29 @@ public class MinecraftCrashHandler {
         
         // 导出日志与输出
         try? FileManager.default.copyItem(at: SharedConstants.shared.logURL, to: tmp.root.appending(path: "PCL.Mac 启动器日志.log"))
-        try? FileManager.default.copyItem(at: launcher.logURL, to: tmp.root.appending(path: "游戏崩溃前的输出.txt"))
+        try? FileManager.default.copyItem(at: state.logURL, to: tmp.root.appending(path: "游戏崩溃前的输出.txt"))
         copyGameLogs(instance: instance, report: tmp.root)
         
         try? FileManager.default.copyItem(at: instance.runningDirectory.appending(path: instance.name + ".json"), to: tmp.root.appending(path: instance.name + ".json"))
         try? FileManager.default.zipItem(at: tmp.root, to: destination, shouldKeepParent: false)
         debug("错误报告导出完成")
-        try? FileManager.default.removeItem(at: launcher.logURL)
+        try? FileManager.default.removeItem(at: state.logURL)
         tmp.free()
+    }
+    
+    private static func printNativesArchitecture(nativesDirectory: URL) {
+        do {
+            let contents = try FileManager.default.contentsOfDirectory(
+                at: nativesDirectory,
+                includingPropertiesForKeys: nil
+            )
+            for fileURL in contents {
+                if fileURL.pathExtension != "dylib" { continue }
+                log("\(fileURL.lastPathComponent) 架构: \(Architecture.getArchOfFile(fileURL))")
+            }
+        } catch {
+            err("无法获取本地库: \(error.localizedDescription)")
+        }
     }
     
     private static func copyGameLogs(instance: MinecraftInstance, report: URL) {

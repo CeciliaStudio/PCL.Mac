@@ -11,20 +11,28 @@ import Cocoa
 public class MinecraftLauncher {
     private let instance: MinecraftInstance
     private let id = UUID()
+    private let state: LaunchState
     public let logURL: URL
     
-    public init?(_ instance: MinecraftInstance) {
+    public init?(_ instance: MinecraftInstance, state: LaunchState) {
         self.instance = instance
         self.logURL = SharedConstants.shared.applicationSupportURL.appending(path: "GameLogs").appending(path: id.uuidString + ".log")
+        self.state = state
+        self.state.logURL = self.logURL
         try? FileManager.default.createDirectory(at: logURL.parent(), withIntermediateDirectories: true)
         FileManager.default.createFile(atPath: logURL.path, contents: Data())
     }
     
-    public func launch(_ options: LaunchOptions, _ callback: @MainActor @escaping (Int32) -> Void = { _ in }) {
+    /// 使用指定的启动选项启动游戏。
+    /// - Parameter options: 启动选项
+    /// - Returns: 游戏进程退出代码
+    public func launch(_ options: LaunchOptions) async -> Int32 {
         let process = Process()
         process.executableURL = options.javaPath
         process.environment = ProcessInfo.processInfo.environment
         process.arguments = []
+        
+        await state.setStage(.buildArgs)
         process.arguments!.append(contentsOf: buildJvmArguments(options))
         process.arguments!.append(instance.manifest.mainClass)
         process.arguments!.append(contentsOf: buildGameArguments(options))
@@ -53,9 +61,9 @@ public class MinecraftLauncher {
                     logHandle.seekToEndOfFile()
                 }
             }
-            
             try process.run()
             
+            await state.setStage(.waitForWindow)
             Task { // 轮询判断窗口是否出现
                 while process.isRunning {
                     let options = CGWindowListOption(arrayLiteral: .excludeDesktopElements, .optionOnScreenOnly)
@@ -67,6 +75,7 @@ public class MinecraftLauncher {
                         if let windowPID = info["kCGWindowOwnerPID"] as? Int32,
                            windowPID == process.processIdentifier {
                             log("窗口已出现")
+                            await state.setStage(.finish)
                             return
                         }
                     }
@@ -80,13 +89,12 @@ public class MinecraftLauncher {
                 debug("检测到退出代码为 0，已删除日志")
                 try? FileManager.default.removeItem(at: self.logURL)
             }
-            DispatchQueue.main.async {
-                callback(process.terminationStatus)
-            }
             instance.process = nil
+            return process.terminationStatus
         } catch {
             err(error.localizedDescription)
         }
+        return -1
     }
     
     public func buildJvmArguments(_ options: LaunchOptions) -> [String] {
@@ -160,6 +168,3 @@ public class MinecraftLauncher {
     }
 }
 
-public class LaunchState: ObservableObject {
-    @Published public var isLaunched: Bool = false
-}

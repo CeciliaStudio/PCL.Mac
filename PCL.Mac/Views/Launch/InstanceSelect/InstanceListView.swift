@@ -47,6 +47,7 @@ struct InstanceListView: View {
             }
         }
         .onAppear {
+            AppSettings.shared.currentMinecraftDirectory = directory
             if directory.instances.isEmpty {
                 directory.loadInnerInstances { result in
                     hasFinishedLoading = true

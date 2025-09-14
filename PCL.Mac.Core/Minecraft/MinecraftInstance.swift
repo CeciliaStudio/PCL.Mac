@@ -167,6 +167,9 @@ public class MinecraftInstance: Identifiable, Equatable, Hashable {
     }
     
     public func launch(_ launchOptions: LaunchOptions) async {
+        let state = LaunchState()
+        await state.setStage(.login)
+        // 登录账号
         if let account = launchOptions.account {
             launchOptions.playerName = account.name
             launchOptions.uuid = account.uuid
@@ -189,35 +192,39 @@ public class MinecraftInstance: Identifiable, Equatable, Hashable {
         }
         
         if !config.skipResourcesCheck && !launchOptions.skipResourceCheck {
+            await state.setStage(.resourcesCheck)
             log("正在进行资源完整性检查")
             try? await MinecraftInstaller.completeResources(self)
             log("资源完整性检查完成")
         }
         
-        let launcher = MinecraftLauncher(self)!
-        launcher.launch(launchOptions) { exitCode in
-            if exitCode != 0 {
-                log("检测到非 0 退出代码")
-                hint("检测到 Minecraft 出现错误，错误分析已开始……")
-                Task {
-                    if await PopupManager.shared.showAsync(
-                        .init(.error, "Minecraft 出现错误", "很抱歉，PCL.Mac 暂时没有分析功能。\n如果要寻求帮助，请把错误报告文件发给对方，而不是发送这个窗口的照片或者截图。\n不要截图！不要截图！！不要截图！！！", [.ok, .init(label: "导出错误报告", style: .accent)])
-                    ) == 1 {
-                        let savePanel = NSSavePanel()
-                        savePanel.title = "选择导出位置"
-                        savePanel.prompt = "导出"
-                        savePanel.allowedContentTypes = [.zip]
-                        let formatter = DateFormatter()
-                        formatter.dateFormat = "yyyy-M-d_HH.mm.ss"
-                        savePanel.nameFieldStringValue = "错误报告-\(formatter.string(from: .init()))"
-                        savePanel.beginSheetModal(for: NSApplication.shared.windows.first!) { [unowned self] result in
-                            if result == .OK {
-                                if let url = savePanel.url {
-                                    MinecraftCrashHandler.exportErrorReport(self, launcher, to: url)
-                                }
-                            }
-                        }
-                    }
+        let launcher = MinecraftLauncher(self, state: state)!
+        let exitCode = await launcher.launch(launchOptions)
+        if exitCode != 0 {
+            log("检测到非 0 退出代码")
+            hint("检测到 Minecraft 出现错误，错误分析已开始……")
+            if await PopupManager.shared.showAsync(
+                .init(.error, "Minecraft 出现错误", "很抱歉，PCL.Mac 暂时没有分析功能。\n如果要寻求帮助，请把错误报告文件发给对方，而不是发送这个窗口的照片或者截图。\n不要截图！不要截图！！不要截图！！！", [.ok, .init(label: "导出错误报告", style: .accent)])
+            ) == 1 {
+                await MainActor.run {
+                    onCrash(options: launchOptions, state: state)
+                }
+            }
+        }
+    }
+    
+    private func onCrash(options: LaunchOptions, state: LaunchState) {
+        let savePanel = NSSavePanel()
+        savePanel.title = "选择导出位置"
+        savePanel.prompt = "导出"
+        savePanel.allowedContentTypes = [.zip]
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-M-d_HH.mm.ss"
+        savePanel.nameFieldStringValue = "错误报告-\(formatter.string(from: .init()))"
+        savePanel.beginSheetModal(for: NSApplication.shared.windows.first!) { [unowned self] result in
+            if result == .OK {
+                if let url = savePanel.url {
+                    MinecraftCrashHandler.exportErrorReport(instance: self, options: options, state: state, to: url)
                 }
             }
         }

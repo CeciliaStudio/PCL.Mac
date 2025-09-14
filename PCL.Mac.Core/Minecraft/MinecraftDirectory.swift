@@ -71,6 +71,12 @@ public class MinecraftDirectory: Codable, Identifiable, Hashable, ObservableObje
                     }
                 }
                 await MainActor.run {
+                    self.instances.sort { instance1, instance2 in
+                        if instance1.brand == instance2.brand {
+                            return instance1.version > instance2.version
+                        }
+                        return instance1.brand.index < instance2.brand.index
+                    }
                     callback?(.success(self.instances))
                 }
             } catch {

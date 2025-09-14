@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// 启动选项，在 MinecraftLauncher.launch 被调用时不再被更改
 public class LaunchOptions {
     public var javaPath: URL!
     public var isDemo: Bool = false
