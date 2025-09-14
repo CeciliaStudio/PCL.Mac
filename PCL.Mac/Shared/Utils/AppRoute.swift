@@ -23,14 +23,14 @@ public enum AppRoute: Hashable {
     case versionSelect
     case projectDownload(summary: ProjectSummary)
     case announcementHistory
-    case versionSettings(instance: MinecraftInstance)
+    case instanceSettings(instance: MinecraftInstance)
     
     // MyList 导航
     case minecraftDownload
     case projectSearch(type: ProjectType)
     case versionList(directory: MinecraftDirectory)
     case instanceOverview
-    case instanceSettings
+    case instanceConfig
     case instanceMods
     case javaDownload
     
@@ -60,7 +60,7 @@ public enum AppRoute: Hashable {
         case .installing(let task): "installing?task=\(task.id)"
         case .projectDownload(let summary): "projectDownload?summary=\(summary.modId)"
         case .versionList(let directory): "versionList?rootURL=\(directory.rootURL.path)"
-        case .versionSettings(let instance): "versionSettings?instance=\(instance.name)"
+        case .instanceSettings(let instance): "versionSettings?instance=\(instance.name)"
         case .projectSearch(let type): "projectSearch?type=\(type)"
         default:
             String(describing: self)
@@ -74,7 +74,7 @@ public enum AppRoute: Hashable {
         case .projectDownload(let summary): "资源下载 - \(summary.name)"
         case .accountManagement, .accountList, .newAccount: "账号管理"
         case .announcementHistory: "历史公告"
-        case .versionSettings, .instanceOverview, .instanceSettings, .instanceMods: "实例设置 - \(AppSettings.shared.defaultInstance ?? "")"
+        case .instanceSettings, .instanceOverview, .instanceConfig, .instanceMods: "实例设置 - \(AppSettings.shared.defaultInstance ?? "")"
         case .javaDownload: "Java 下载"
         case .themeUnlock: "主题解锁"
         default: "发现问题请在 https://github.com/CeciliaStudio/PCL.Mac/issues/new 上反馈！"
@@ -115,13 +115,13 @@ public class AppRouter: ObservableObject {
         case .installing(let tasks):
             InstallingView(tasks: tasks)
         case .versionSelect, .versionList(_):
-            VersionSelectView()
+            InstanceSelectView()
         case .projectDownload(let summary):
             ProjectDownloadView(id: summary.modId)
         case .announcementHistory:
             AnnouncementHistoryView()
-        case .versionSettings, .instanceOverview, .instanceSettings, .instanceMods:
-            VersionSettingsView()
+        case .instanceSettings, .instanceOverview, .instanceConfig, .instanceMods:
+            InstanceSettingsView()
         case .javaDownload:
             JavaInstallView()
         case .themeUnlock:

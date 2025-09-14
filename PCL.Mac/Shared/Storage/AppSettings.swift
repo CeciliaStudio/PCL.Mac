@@ -125,7 +125,9 @@ public class AppSettings: ObservableObject {
             
             if defaultInstance == nil {
                 directory.loadInnerInstances { instances in
-                    self.defaultInstance = instances.first?.name
+                    if case .success(let instances) = instances {
+                        self.defaultInstance = instances.first?.name
+                    }
                 }
             }
         }

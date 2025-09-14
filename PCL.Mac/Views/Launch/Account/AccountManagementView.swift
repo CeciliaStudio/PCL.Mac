@@ -26,7 +26,7 @@ struct AccountManagementView: View, SubRouteContainer {
                 VStack(alignment: .leading, spacing: 0) {
                     MyList(
                         root: .accountManagement,
-                        cases: .constant([.accountList, .newAccount])
+                        cases: [.accountList, .newAccount]
                     ) { type, isSelected in
                         createListItemView(type)
                             .foregroundStyle(isSelected ? AnyShapeStyle(AppSettings.shared.theme.getTextStyle()) : AnyShapeStyle(Color("TextColor")))

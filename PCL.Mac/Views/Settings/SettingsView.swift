@@ -28,7 +28,7 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     MyList(
                         root: .settings,
-                        cases: .constant([.personalization, .javaSettings, .otherSettings])
+                        cases: [.personalization, .javaSettings, .otherSettings]
                     ) { type, isSelected in
                         createListItemView(type)
                             .foregroundStyle(isSelected ? AnyShapeStyle(AppSettings.shared.theme.getTextStyle()) : AnyShapeStyle(Color("TextColor")))

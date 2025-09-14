@@ -42,14 +42,16 @@ public class MinecraftInstance: Identifiable, Equatable, Hashable {
         create(directory.versionsURL.appending(path: name), config: config)
     }
     
-    public static func create(_ runningDirectory: URL, config: MinecraftConfig? = nil) -> MinecraftInstance? {
+    public static func create(_ runningDirectory: URL, config: MinecraftConfig? = nil, doCache: Bool = true) -> MinecraftInstance? {
         if let cached = cache[runningDirectory] {
             return cached
         }
         
         let instance: MinecraftInstance = .init(runningDirectory: runningDirectory, config: config)
         if instance.setup() {
-            cache[runningDirectory] = instance
+            if doCache {
+                cache[runningDirectory] = instance
+            }
             return instance
         } else {
             err("实例初始化失败")

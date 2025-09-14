@@ -40,7 +40,11 @@ public class MinecraftInstaller {
     ///   - version: 客户端版本。
     ///   - instanceURL: 实例运行目录。
     /// - Returns: 解析后的清单。
-    public static func downloadClientManifest(task: InstallTask? = nil, version: MinecraftVersion, instanceURL: URL) async throws -> ClientManifest {
+    public static func downloadClientManifest(
+        task: InstallTask? = nil,
+        version: MinecraftVersion,
+        instanceURL: URL
+    ) async throws -> ClientManifest {
         let url = try DownloadSourceManager.shared.getClientManifestURL(version).unwrap("无法获取 \(version.displayName) 的 JSON 下载 URL。")
         let destination = instanceURL.appending(path: "\(instanceURL.lastPathComponent).json")
         
@@ -62,7 +66,12 @@ public class MinecraftInstaller {
     ///   - version: 客户端版本。
     ///   - manifest: 客户端清单 (JSON)。
     ///   - instanceURL: 实例运行目录。
-    public static func downloadClientJar(task: InstallTask? = nil, version: MinecraftVersion, manifest: ClientManifest, instanceURL: URL) async throws {
+    public static func downloadClientJar(
+        task: InstallTask? = nil,
+        version: MinecraftVersion,
+        manifest: ClientManifest,
+        instanceURL: URL
+    ) async throws {
         let url = try DownloadSourceManager.shared.getClientJARURL(version, manifest).unwrap("无法获取 \(version.displayName) 的客户端下载 URL。")
         
         try await SingleFileDownloader.download(
@@ -80,7 +89,12 @@ public class MinecraftInstaller {
     ///   - manifest: 客户端清单。
     ///   - directory: 实例所在的 `MinecraftDirectory`。
     /// - Returns: 解析后的 `AssetIndex`。
-    public static func downloadAssetIndex(task: InstallTask? = nil, version: MinecraftVersion, manifest: ClientManifest, directory: MinecraftDirectory) async throws -> AssetIndex {
+    public static func downloadAssetIndex(
+        task: InstallTask? = nil,
+        version: MinecraftVersion,
+        manifest: ClientManifest,
+        directory: MinecraftDirectory
+    ) async throws -> AssetIndex {
         let url: URL = try DownloadSourceManager.shared.getAssetIndexURL(version, manifest).unwrap("无法获取 \(version.displayName) 的 assetIndex 下载 URL。")
         let destination: URL = directory.assetsURL.appending(path: "indexes").appending(path: "\(manifest.assetIndex!.id).json")
         try await SingleFileDownloader.download(task: task, url: url, destination: destination)
@@ -99,7 +113,11 @@ public class MinecraftInstaller {
     ///   - task: 安装任务，仅用于进度更新。
     ///   - assetIndex: 资源索引。
     ///   - directory: 目标 `MinecraftDirectory`。
-    public static func downloadHashResourcesFiles(task: InstallTask? = nil, assetIndex: AssetIndex, directory: MinecraftDirectory) async throws {
+    public static func downloadHashResourcesFiles(
+        task: InstallTask? = nil,
+        assetIndex: AssetIndex,
+        directory: MinecraftDirectory
+    ) async throws {
         var urls: [URL] = []
         var destinations: [URL] = []
         
@@ -117,7 +135,11 @@ public class MinecraftInstaller {
     ///   - task: 安装任务，仅用于进度更新。
     ///   - manifest: 客户端清单。
     ///   - directory: 目标 `MinecraftDirectory`
-    public static func downloadLibraries(task: InstallTask? = nil, manifest: ClientManifest, directory: MinecraftDirectory) async throws {
+    public static func downloadLibraries(
+        task: InstallTask? = nil,
+        manifest: ClientManifest,
+        directory: MinecraftDirectory
+    ) async throws {
         var libraryNames: [String] = []
         var items: [DownloadItem] = []
         
@@ -148,7 +170,11 @@ public class MinecraftInstaller {
     ///   - task: 安装任务，仅用于进度更新。
     ///   - manifest: 客户端清单。
     ///   - directory: 目标 `MinecraftDirectory`
-    public static func downloadNatives(task: InstallTask? = nil, manifest: ClientManifest, directory: MinecraftDirectory) async throws {
+    public static func downloadNatives(
+        task: InstallTask? = nil,
+        manifest: ClientManifest,
+        directory: MinecraftDirectory
+    ) async throws {
         var libraryNames: [String] = []
         var items: [DownloadItem] = []
         

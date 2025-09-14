@@ -37,7 +37,7 @@ struct DownloadView: View {
                         .padding(.top, 20)
                         .padding(.bottom, 4)
                     MyList(
-                        cases: .constant([.minecraftDownload])
+                        cases: [.minecraftDownload]
                     ) { type, isSelected in
                         createListItemView(type)
                             .foregroundStyle(isSelected ? AnyShapeStyle(AppSettings.shared.theme.getTextStyle()) : AnyShapeStyle(Color("TextColor")))
@@ -50,7 +50,7 @@ struct DownloadView: View {
                         .padding(.top, 32)
                         .padding(.bottom, 4)
                     MyList(
-                        cases: .constant([.projectSearch(type: .mod), .projectSearch(type: .resourcepack)]),
+                        cases: [.projectSearch(type: .mod), .projectSearch(type: .resourcepack)],
                         animationIndex: 2
                     ) { type, isSelected in
                         createListItemView(type)

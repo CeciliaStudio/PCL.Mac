@@ -1,5 +1,5 @@
 //
-//  InstanceSettingsView.swift
+//  InstanceConfigView.swift
 //  PCL.Mac
 //
 //  Created by YiZhiMCQiu on 2025/7/31.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct InstanceSettingsView: View {
+struct InstanceConfigView: View {
     @State var instance: MinecraftInstance
     @State private var memoryText: String
     

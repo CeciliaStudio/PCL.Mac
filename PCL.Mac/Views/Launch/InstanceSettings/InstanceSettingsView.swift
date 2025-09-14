@@ -1,5 +1,5 @@
 //
-//  VersionSettingsView.swift
+//  InstanceSettingsView.swift
 //  PCL.Mac
 //
 //  Created by YiZhiMCQiu on 2025/7/16.
@@ -9,7 +9,7 @@ import SwiftUI
 import ZIPFoundation
 import SwiftyJSON
 
-struct VersionSettingsView: View, SubRouteContainer {
+struct InstanceSettingsView: View, SubRouteContainer {
     @ObservedObject private var dataManager: DataManager = .shared
     
     private let instance: MinecraftInstance!
@@ -29,8 +29,8 @@ struct VersionSettingsView: View, SubRouteContainer {
             switch dataManager.router.getLast() {
             case .instanceOverview:
                 InstanceOverviewView(instance: instance)
-            case .instanceSettings:
-                InstanceSettingsView(instance: instance)
+            case .instanceConfig:
+                InstanceConfigView(instance: instance)
             case .instanceMods:
                 InstanceModsView(instance: instance)
             default:
@@ -41,18 +41,17 @@ struct VersionSettingsView: View, SubRouteContainer {
             dataManager.leftTab(200) {
                 VStack(alignment: .leading, spacing: 0) {
                     MyList(
-                        root: .versionSettings(instance: instance),
-                        cases: .constant(
-                            [
-                                .instanceOverview,
-                                .instanceSettings,
-                                .instanceMods
-                            ]
-                        )) { route, isSelected in
-                            createListItemView(route)
-                                .foregroundStyle(isSelected ? AnyShapeStyle(AppSettings.shared.theme.getTextStyle()) : AnyShapeStyle(Color("TextColor")))
-                        }
-                        .padding(.top, 10)
+                        root: .instanceSettings(instance: instance),
+                        cases: [
+                            .instanceOverview,
+                            .instanceConfig,
+                            .instanceMods
+                        ]
+                    ) { route, isSelected in
+                        createListItemView(route)
+                            .foregroundStyle(isSelected ? AnyShapeStyle(AppSettings.shared.theme.getTextStyle()) : AnyShapeStyle(Color("TextColor")))
+                    }
+                    .padding(.top, 10)
                     Spacer()
                 }
             }
@@ -67,7 +66,7 @@ struct VersionSettingsView: View, SubRouteContainer {
         case .instanceOverview:
             imageName = "GameDownloadIcon"
             text = "概览"
-        case .instanceSettings:
+        case .instanceConfig:
             imageName = "SettingsIcon"
             text = "设置"
         case .instanceMods:

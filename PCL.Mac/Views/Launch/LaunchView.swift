@@ -77,7 +77,7 @@ fileprivate struct LeftTab: View {
                 if AppSettings.shared.defaultInstance != nil {
                     MyButton(text: "实例设置") {
                         if let instance = self.instance {
-                            dataManager.router.append(.versionSettings(instance: instance))
+                            dataManager.router.append(.instanceSettings(instance: instance))
                         }
                     }
                 }
