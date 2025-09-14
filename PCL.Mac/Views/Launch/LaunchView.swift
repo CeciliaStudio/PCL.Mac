@@ -7,10 +7,28 @@
 
 import SwiftUI
 
+fileprivate struct LaunchingLeftTab: View {
+    @ObservedObject private var launchState: LaunchState
+    
+    init(launchState: LaunchState) {
+        self.launchState = launchState
+    }
+    
+    var body: some View {
+        Text(launchState.stage.rawValue)
+            .font(.custom("PCL English", size: 14))
+            .foregroundStyle(Color("TextColor"))
+            .onChange(of: launchState.stage) { oldValue, newValue in
+                if newValue == .finish {
+                    DataManager.shared.launchState = nil
+                }
+            }
+    }
+}
+
 fileprivate struct LeftTab: View {
     @ObservedObject private var dataManager: DataManager = .shared
     @ObservedObject private var accountManager: AccountManager = .shared
-    
     @State private var instance: MinecraftInstance?
     
     private var accountView: some View {
@@ -47,16 +65,26 @@ fileprivate struct LeftTab: View {
     var body: some View {
         VStack {
             Spacer()
-            accountView
+            if let launchState = dataManager.launchState {
+                LaunchingLeftTab(launchState: launchState)
+            } else {
+                accountView
+            }
             Spacer()
             if let instance = self.instance {
                 MyButton(text: "启动游戏", descriptionText: instance.name, foregroundStyle: AppSettings.shared.theme.getTextStyle()) {
+                    if dataManager.launchState != nil { return }
                     let launchOptions: LaunchOptions = .init()
+                    let launchState: LaunchState = .init()
+                    dataManager.launchState = launchState
                     
                     Task {
                         guard await launchPrecheck(launchOptions) else { return }
                         debug("正在启动游戏")
-                        await instance.launch(launchOptions)
+                        await instance.launch(launchOptions, launchState)
+                        await MainActor.run {
+                            self.dataManager.launchState = nil
+                        }
                     }
                 }
                 .frame(height: 55)

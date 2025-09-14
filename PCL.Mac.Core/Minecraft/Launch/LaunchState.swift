@@ -20,6 +20,11 @@ public class LaunchState: ObservableObject {
     }
 }
 
-public enum LaunchStage {
-    case preCheck, login, resourcesCheck, buildArgs, waitForWindow, finish
+public enum LaunchStage: String {
+    case preCheck = "预检查"
+    case login = "登录"
+    case resourcesCheck = "检查资源完整性"
+    case buildArgs = "构建启动命令"
+    case waitForWindow = "等待窗口出现"
+    case finish = "完成"
 }

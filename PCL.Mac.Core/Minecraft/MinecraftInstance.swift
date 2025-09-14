@@ -166,10 +166,9 @@ public class MinecraftInstance: Identifiable, Equatable, Hashable {
         return suitableJava
     }
     
-    public func launch(_ launchOptions: LaunchOptions) async {
-        let state = LaunchState()
-        await state.setStage(.login)
+    public func launch(_ launchOptions: LaunchOptions, _ launchState: LaunchState) async {
         // 登录账号
+        await launchState.setStage(.login)
         if let account = launchOptions.account {
             launchOptions.playerName = account.name
             launchOptions.uuid = account.uuid
@@ -181,6 +180,7 @@ public class MinecraftInstance: Identifiable, Equatable, Hashable {
         }
         launchOptions.javaPath = config.javaURL
         
+        // 处理 Rosetta
         loadManifest()
         if Architecture.getArchOfFile(launchOptions.javaPath).isCompatiableWithSystem() {
             ArtifactVersionMapper.map(manifest)
@@ -191,14 +191,16 @@ public class MinecraftInstance: Identifiable, Equatable, Hashable {
             warn("正在使用 Rosetta 运行 Minecraft")
         }
         
+        // 资源完整性检查
         if !config.skipResourcesCheck && !launchOptions.skipResourceCheck {
-            await state.setStage(.resourcesCheck)
+            await launchState.setStage(.resourcesCheck)
             log("正在进行资源完整性检查")
             try? await MinecraftInstaller.completeResources(self)
             log("资源完整性检查完成")
         }
         
-        let launcher = MinecraftLauncher(self, state: state)!
+        // 启动 Minecraft
+        let launcher = MinecraftLauncher(self, state: launchState)!
         let exitCode = await launcher.launch(launchOptions)
         if exitCode != 0 {
             log("检测到非 0 退出代码")
@@ -207,7 +209,7 @@ public class MinecraftInstance: Identifiable, Equatable, Hashable {
                 .init(.error, "Minecraft 出现错误", "很抱歉，PCL.Mac 暂时没有分析功能。\n如果要寻求帮助，请把错误报告文件发给对方，而不是发送这个窗口的照片或者截图。\n不要截图！不要截图！！不要截图！！！", [.ok, .init(label: "导出错误报告", style: .accent)])
             ) == 1 {
                 await MainActor.run {
-                    onCrash(options: launchOptions, state: state)
+                    onCrash(options: launchOptions, state: launchState)
                 }
             }
         }

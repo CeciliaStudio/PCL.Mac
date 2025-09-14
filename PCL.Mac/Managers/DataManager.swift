@@ -21,6 +21,7 @@ class DataManager: ObservableObject {
     @Published var leftTabContent: AnyView = AnyView(EmptyView())
     @Published var leftTabId: UUID = .init()
     @Published var inprogressInstallTasks: InstallTasks?
+    @Published var launchState: LaunchState?
     
     var defaultInstance: MinecraftInstance? {
         if let directory = AppSettings.shared.currentMinecraftDirectory,
