@@ -117,8 +117,8 @@ fileprivate struct AccountView: View {
 public extension AnyAccount {
     var authMethodName: String {
         switch self {
-        case .microsoft:  return "微软账号"
-        case .offline:    return "离线账号"
+        case .microsoft:  return "微软验证"
+        case .offline:    return "离线验证"
         case .yggdrasil(let account):  return account.authenticationServerName
         }
     }

@@ -7,6 +7,19 @@
 
 import SwiftUI
 
+fileprivate struct ProgressModifier: AnimatableModifier {
+    var progress: Double
+
+    var animatableData: Double {
+        get { progress }
+        set { progress = newValue }
+    }
+
+    func body(content: Content) -> some View {
+        Text(String(format: "%.2f%%", progress * 100))
+    }
+}
+
 fileprivate struct LaunchingLeftTab: View {
     @ObservedObject private var launchState: LaunchState
     @State private var progress: Double = 0
@@ -36,15 +49,15 @@ fileprivate struct LaunchingLeftTab: View {
                     .frame(width: (1 - progress) * 260)
             }
             .frame(width: 260, height: 4)
+            .padding(.bottom, 27)
             
-            Text(launchState.stage.rawValue)
-                .font(.custom("PCL English", size: 14))
-                .foregroundStyle(Color("TextColor"))
-                .onChange(of: launchState.stage) { oldValue, newValue in
-                    if newValue == .finish {
-                        DataManager.shared.launchState = nil
-                    }
+            VStack(alignment: .leading, spacing: 5) {
+                LaunchingInfoRow(label: "当前步骤", value: launchState.stage.rawValue)
+                LaunchingInfoRow(label: "验证方式", value: launchState.options.account!.authMethodName)
+                if progress < 1.0 {
+                    LaunchingInfoRow(label: "启动进度", value: "", modifier: ProgressModifier(progress: progress))
                 }
+            }
         }
         .onAppear {
             DataManager.shared.leftTabId = .init()
@@ -52,6 +65,36 @@ fileprivate struct LaunchingLeftTab: View {
         .onChange(of: launchState.progress) { oldValue, newValue in
             withAnimation(.easeInOut(duration: 0.2)) {
                 self.progress = newValue
+            }
+        }
+        .onChange(of: launchState.stage) { oldValue, newValue in
+            if newValue == .finish {
+                DataManager.shared.launchState = nil
+            }
+        }
+    }
+    
+    private struct LaunchingInfoRow<M: ViewModifier>: View {
+        private let label: String
+        private let value: String
+        private let modifier: M
+        
+        init(label: String, value: String, modifier: M = EmptyModifier()) {
+            self.label = label
+            self.value = value
+            self.modifier = modifier
+        }
+        
+        var body: some View {
+            HStack {
+                Text(label)
+                    .font(.custom("PCL English", size: 14))
+                    .foregroundStyle(Color("TextColor"))
+                    .opacity(0.5)
+                Text(value)
+                    .modifier(modifier)
+                    .font(.custom("PCL English", size: 14))
+                    .foregroundStyle(Color("TextColor"))
             }
         }
     }
@@ -99,7 +142,7 @@ fileprivate struct LeftTab: View {
                 MyButton(text: "启动游戏", descriptionText: instance.name, foregroundStyle: AppSettings.shared.theme.getTextStyle()) {
                     if dataManager.launchState != nil { return }
                     let launchOptions: LaunchOptions = .init()
-                    let launchState: LaunchState = .init()
+                    let launchState: LaunchState = .init(options: launchOptions)
                     dataManager.launchState = launchState
                     
                     Task {

@@ -12,7 +12,12 @@ import Foundation
 public class LaunchState: ObservableObject {
     @Published public var stage: LaunchStage = .preCheck
     @Published public var progress: Double = 0
+    public let options: LaunchOptions
     public var logURL: URL!
+    
+    public init(options: LaunchOptions) {
+        self.options = options
+    }
     
     public func setStage(_ stage: LaunchStage) async {
         await MainActor.run {
@@ -27,7 +32,7 @@ public enum LaunchStage: String {
     case login = "登录"
     case resourcesCheck = "检查资源完整性"
     case buildArgs = "构建启动命令"
-    case waitForWindow = "等待窗口出现"
+    case waitForWindow = "等待游戏窗口出现"
     case finish = "完成"
     
     public var progress: Double {
