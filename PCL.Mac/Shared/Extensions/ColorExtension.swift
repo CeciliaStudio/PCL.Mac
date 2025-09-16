@@ -20,6 +20,9 @@ class ColorConstants {
         return !isDark
     }
     
+    public static let hue: Double = 210
+    public static let sat: Double = 85
+    
     public static var L1: Double { isLight ? 25 : 96 }
     public static var L2: Double { isLight ? 45 : 75 }
     public static var L3: Double { isLight ? 55 : 60 }
@@ -38,6 +41,16 @@ class ColorConstants {
     
     public static var LaP: Double { isLight ? 1 : 0.75 }
     public static var LaN: Double { isLight ? 0.5 : 0.75 }
+    
+    public static var Color1: Color { Color(h2: hue, s2: sat * Sa0 * 0.2, l2: L1) }
+    public static var Color2: Color { Color(h2: hue, s2: sat * Sa0, l2: L2) }
+    public static var Color3: Color { Color(h2: hue, s2: sat * Sa0, l2: L3) }
+    public static var Color4: Color { Color(h2: hue, s2: sat * Sa0, l2: L4) }
+    public static var Color5: Color { Color(h2: hue, s2: sat * Sa1, l2: L5) }
+    public static var Color6: Color { Color(h2: hue, s2: sat * Sa1, l2: L6) }
+    public static var Color7: Color { Color(h2: hue, s2: sat * Sa1, l2: L7) }
+    public static var Color8: Color { Color(h2: hue, s2: sat * Sa1, l2: L8) }
+    
 }
 
 public extension Color {

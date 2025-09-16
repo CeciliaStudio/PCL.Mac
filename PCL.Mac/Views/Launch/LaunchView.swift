@@ -9,20 +9,51 @@ import SwiftUI
 
 fileprivate struct LaunchingLeftTab: View {
     @ObservedObject private var launchState: LaunchState
+    @State private var progress: Double = 0
     
     init(launchState: LaunchState) {
         self.launchState = launchState
     }
     
     var body: some View {
-        Text(launchState.stage.rawValue)
-            .font(.custom("PCL English", size: 14))
-            .foregroundStyle(Color("TextColor"))
-            .onChange(of: launchState.stage) { oldValue, newValue in
-                if newValue == .finish {
-                    DataManager.shared.launchState = nil
-                }
+        VStack {
+            // 进度条
+            HStack(spacing: 0) {
+                Rectangle()
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(stops: [
+                                .init(color: ColorConstants.Color4, location: 0),
+                                .init(color: ColorConstants.Color3, location: 0.6)
+                            ]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .frame(width: progress * 260)
+                Rectangle()
+                    .fill(ColorConstants.Color6)
+                    .frame(width: (1 - progress) * 260)
             }
+            .frame(width: 260, height: 4)
+            
+            Text(launchState.stage.rawValue)
+                .font(.custom("PCL English", size: 14))
+                .foregroundStyle(Color("TextColor"))
+                .onChange(of: launchState.stage) { oldValue, newValue in
+                    if newValue == .finish {
+                        DataManager.shared.launchState = nil
+                    }
+                }
+        }
+        .onAppear {
+            DataManager.shared.leftTabId = .init()
+        }
+        .onChange(of: launchState.progress) { oldValue, newValue in
+            withAnimation(.easeInOut(duration: 0.2)) {
+                self.progress = newValue
+            }
+        }
     }
 }
 
@@ -62,15 +93,8 @@ fileprivate struct LeftTab: View {
         }
     }
     
-    var body: some View {
-        VStack {
-            Spacer()
-            if let launchState = dataManager.launchState {
-                LaunchingLeftTab(launchState: launchState)
-            } else {
-                accountView
-            }
-            Spacer()
+    private var launchButtons: some View {
+        Group {
             if let instance = self.instance {
                 MyButton(text: "启动游戏", descriptionText: instance.name, foregroundStyle: AppSettings.shared.theme.getTextStyle()) {
                     if dataManager.launchState != nil { return }
@@ -113,6 +137,20 @@ fileprivate struct LeftTab: View {
             .frame(height: 32)
             .padding()
             .padding(.bottom, 4)
+        }
+    }
+    
+    var body: some View {
+        VStack {
+            Spacer()
+            if let launchState = dataManager.launchState {
+                LaunchingLeftTab(launchState: launchState)
+                Spacer()
+            } else {
+                accountView
+                Spacer()
+                launchButtons
+            }
         }
         .frame(width: 300)
         .foregroundStyle(Color(hex: 0x343D4A))

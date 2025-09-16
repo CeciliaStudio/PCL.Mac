@@ -32,13 +32,13 @@ struct MyList<Content: View>: View {
             ForEach(cases.indices, id: \.self) { index in
                 let item = cases[index]
                 RouteView(content: content, item: item, height: height)
-                    .offset(x: appeared.contains(item) ? 0 : -dataManager.leftTabWidth / 2)
+                    .offset(x: appeared.contains(item) ? 0 : -dataManager.leftTabWidth / 4)
                     .opacity(appeared.contains(item) ? 1 : 0)
                     .onAppear {
                         if !appeared.contains(item) {
                             DispatchQueue.main.asyncAfter(deadline: .now() + Double(index + animationIndex) * 0.038) {
                                 let item1 = item
-                                withAnimation(.spring(response: 0.4, dampingFraction: 0.65)) {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.65)) {
                                     _ = appeared.insert(item1)
                                 }
                             }

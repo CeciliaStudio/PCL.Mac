@@ -18,9 +18,9 @@
         "startPoint": [0.9, 0.0],
         "endPoint": [0.1, 1.0],
         "colors": [
-            { "color": "hsl(195, 68, 80)", "darkColor": "hsl(195, 68, 8)", "location": -0.1 },
-            { "color": "hsl(210, 68, 90)", "darkColor": "hsl(210, 68, 9)", "location": 0.4 },
-            { "color": "hsl(225, 68, 80)", "darkColor": "hsl(225, 68, 8)", "location": 1.1 }
+            { "color": "hsl(195, 85, 80)", "darkColor": "hsl(195, 85, 8)", "location": -0.1 },
+            { "color": "hsl(210, 85, 90)", "darkColor": "hsl(210, 85, 9)", "location": 0.4 },
+            { "color": "hsl(225, 85, 80)", "darkColor": "hsl(225, 85, 8)", "location": 1.1 }
         ]
     },
     "textStyle": "#1370F3"

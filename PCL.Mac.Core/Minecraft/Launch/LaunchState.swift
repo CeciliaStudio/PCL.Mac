@@ -11,11 +11,13 @@ import Foundation
 /// 与 `LaunchOptions` 不同，`LaunchState` 仅用于界面展示当前启动阶段等状态
 public class LaunchState: ObservableObject {
     @Published public var stage: LaunchStage = .preCheck
+    @Published public var progress: Double = 0
     public var logURL: URL!
     
     public func setStage(_ stage: LaunchStage) async {
         await MainActor.run {
             self.stage = stage
+            self.progress = stage.progress
         }
     }
 }
@@ -27,4 +29,19 @@ public enum LaunchStage: String {
     case buildArgs = "构建启动命令"
     case waitForWindow = "等待窗口出现"
     case finish = "完成"
+    
+    public var progress: Double {
+        switch self {
+        case .preCheck:
+            0.1
+        case .login:
+            0.4
+        case .resourcesCheck:
+            0.6
+        case .buildArgs:
+            0.7
+        case .waitForWindow, .finish:
+            1.0
+        }
+    }
 }
