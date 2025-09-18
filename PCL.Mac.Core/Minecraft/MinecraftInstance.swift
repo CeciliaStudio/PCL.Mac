@@ -21,7 +21,6 @@ public class MinecraftInstance: Identifiable, Equatable, Hashable {
     public let minecraftDirectory: MinecraftDirectory
     public let configPath: URL
     public private(set) var version: MinecraftVersion! = nil
-    public var process: Process?
     public private(set) var manifest: ClientManifest!
     public var config: MinecraftConfig!
     public var clientBrand: ClientBrand!
@@ -202,8 +201,8 @@ public class MinecraftInstance: Identifiable, Equatable, Hashable {
         // 启动 Minecraft
         let launcher = MinecraftLauncher(self, state: launchState)!
         let exitCode = await launcher.launch(launchOptions)
-        if exitCode != 0 {
-            log("检测到非 0 退出代码")
+        if exitCode != 0 && exitCode != 143 {
+            log("检测到异常退出代码")
             hint("检测到 Minecraft 出现错误，错误分析已开始……")
             if await PopupManager.shared.showAsync(
                 .init(.error, "Minecraft 出现错误", "很抱歉，PCL.Mac 暂时没有分析功能。\n如果要寻求帮助，请把错误报告文件发给对方，而不是发送这个窗口的照片或者截图。\n不要截图！不要截图！！不要截图！！！", [.ok, .init(label: "导出错误报告", style: .accent)])

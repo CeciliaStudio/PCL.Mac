@@ -14,6 +14,7 @@ public class LaunchState: ObservableObject {
     @Published public var progress: Double = 0
     public let options: LaunchOptions
     public var logURL: URL!
+    public var process: Process!
     
     public init(options: LaunchOptions) {
         self.options = options

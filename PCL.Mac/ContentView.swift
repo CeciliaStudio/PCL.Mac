@@ -28,6 +28,16 @@ struct ContentView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
     }
     
+    var stopGameButtonOverlay: some View {
+        Group {
+            if let state = dataManager.launchState {
+                StopGameButtonOverlay(state: state)
+                    .padding()
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+    }
+    
     var hintOverlay: some View {
         VStack {
             Spacer()
@@ -73,6 +83,7 @@ struct ContentView: View {
                 routerOverlay
             }
             installTaskButtonOverlay
+            stopGameButtonOverlay
             ProjectQueueOverlay()
             hintOverlay
             popupOverlay

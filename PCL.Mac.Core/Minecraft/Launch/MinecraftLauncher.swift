@@ -47,7 +47,7 @@ public class MinecraftLauncher {
         }
         process.qualityOfService = instance.config.qualityOfService
         
-        instance.process = process
+        state.process = process
         do {
             let pipe = Pipe()
             process.standardOutput = pipe
@@ -89,7 +89,6 @@ public class MinecraftLauncher {
                 debug("检测到退出代码为 0，已删除日志")
                 try? FileManager.default.removeItem(at: self.logURL)
             }
-            instance.process = nil
             return process.terminationStatus
         } catch {
             err(error.localizedDescription)

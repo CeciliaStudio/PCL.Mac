@@ -53,7 +53,9 @@ fileprivate struct LaunchingLeftTab: View {
             
             VStack(alignment: .leading, spacing: 5) {
                 LaunchingInfoRow(label: "当前步骤", value: launchState.stage.rawValue)
-                LaunchingInfoRow(label: "验证方式", value: launchState.options.account!.authMethodName)
+                if let account = launchState.options.account {
+                    LaunchingInfoRow(label: "验证方式", value: account.authMethodName)
+                }
                 if progress < 1.0 {
                     LaunchingInfoRow(label: "启动进度", value: "", modifier: ProgressModifier(progress: progress))
                 }
@@ -67,9 +69,9 @@ fileprivate struct LaunchingLeftTab: View {
                 self.progress = newValue
             }
         }
-        .onChange(of: launchState.stage) { oldValue, newValue in
-            if newValue == .finish {
-                DataManager.shared.launchState = nil
+        .onChange(of: launchState.stage) { stage in
+            if stage == .finish {
+                DataManager.shared.objectWillChange.send()
             }
         }
     }
@@ -186,7 +188,7 @@ fileprivate struct LeftTab: View {
     var body: some View {
         VStack {
             Spacer()
-            if let launchState = dataManager.launchState {
+            if let launchState = dataManager.launchState, launchState.stage != .finish {
                 LaunchingLeftTab(launchState: launchState)
                 Spacer()
             } else {
