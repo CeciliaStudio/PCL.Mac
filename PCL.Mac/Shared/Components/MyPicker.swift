@@ -65,7 +65,7 @@ struct MyPicker<Entry: Hashable>: View {
                     )
                 }
             }
-            .onChange(of: isFocused) {
+            .onChange(of: isFocused) { _ in
                 if isFocused == false, let overlayId = overlayId {
                     overlayManager.removeOverlay(with: overlayId)
                 }

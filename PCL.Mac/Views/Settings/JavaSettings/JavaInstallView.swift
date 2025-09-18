@@ -28,7 +28,7 @@ struct JavaInstallView: View {
                     Toggle("仅 LTS 版本", isOn: $onlyLTS)
                         .font(.custom("PCL English", size: 14))
                         .foregroundStyle(Color("TextColor"))
-                        .onChange(of: onlyLTS) {
+                        .onChange(of: onlyLTS) { _ in
                             search()
                         }
                 }

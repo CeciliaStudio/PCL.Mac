@@ -136,7 +136,7 @@ struct MyCard<Content: View>: View {
         .onAppear {
             loadState()
         }
-        .onChange(of: unfoldBinding) {
+        .onChange(of: unfoldBinding) { _ in
             if unfoldBinding != isUnfolded {
                 toggle()
             }

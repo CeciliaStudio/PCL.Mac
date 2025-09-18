@@ -16,9 +16,8 @@ struct PCL_MacApp: App {
     }
     
     var body: some Scene {
-        WindowGroup {
-            ContentView()
-                .background(WindowAccessor())
+        Settings {
+            EmptyView()
         }
         .commands {
             CommandGroup(replacing: .appInfo) {
@@ -37,30 +36,5 @@ struct PCL_MacApp: App {
             
             CommandGroup(replacing: .newItem) { } // 修复 #21
         }
-        .windowStyle(.hiddenTitleBar) // 避免刚启动时闪一下标题栏
     }
-}
-
-struct WindowAccessor: NSViewRepresentable {
-    func makeNSView(context: Context) -> NSView {
-        let nsView = NSView()
-        DispatchQueue.main.async {
-            if let window = nsView.window {
-                if AppSettings.shared.showPclMacPopup {
-                    window.setContentSize(NSSize(width: 815, height: 465))
-                }
-                window.isOpaque = false
-                window.backgroundColor = NSColor.clear
-                window.styleMask = [.borderless, .miniaturizable, .resizable]
-                
-                if let contentView = window.contentView {
-                    contentView.wantsLayer = true
-                    contentView.layer?.cornerRadius = 10
-                    contentView.layer?.masksToBounds = true
-                }
-            }
-        }
-        return nsView
-    }
-    func updateNSView(_ nsView: NSView, context: Context) {}
 }

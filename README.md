@@ -3,23 +3,24 @@
 <div align="center">
   <img alt="Logo" src="/.github/assets/icon.png" width="180">
 
-  [![Minimum OS Version](https://img.shields.io/badge/macOS-14.0+-81AD18)](https://developer.apple.com/macos/)
-  [![Stars](https://img.shields.io/github/stars/PCL-Community/PCL.Mac?style=flat)](https://github.com/PCL-Community/PCL.Mac/stargazers)
-  [![Activity](https://img.shields.io/github/commit-activity/y/PCL-Community/PCL.Mac?color=FF6C57)](https://github.com/PCL-Community/PCL.Mac/pulse)
-  [![Contributors](https://img.shields.io/github/contributors/PCL-Community/PCL.Mac)](https://github.com/PCL-Community/PCL.Mac/graphs/contributors)
+  [![Minimum OS Version](https://img.shields.io/badge/macOS-13.0+-81AD18)](https://developer.apple.com/macos/)
+  [![Stars](https://img.shields.io/github/stars/CeciliaStudio/PCL.Mac?style=flat)](https://github.com/CeciliaStudio/PCL.Mac/stargazers)
+  [![Activity](https://img.shields.io/github/commit-activity/y/CeciliaStudio/PCL.Mac?color=FF6C57)](https://github.com/CeciliaStudio/PCL.Mac/pulse)
+  [![Contributors](https://img.shields.io/github/contributors/CeciliaStudio/PCL.Mac)](https://github.com/CeciliaStudio/PCL.Mac/graphs/contributors)
   <br>
-  [![](https://hits.zkitefly.eu.org/?tag=https://github.com/PCL-Community/PCL.Mac)](https://hits.zkitefly.eu.org/?tag=https://github.com/PCL-Community/PCL.Mac&web=true)
+  [![](https://hits.zkitefly.eu.org/?tag=https://github.com/CeciliaStudio/PCL.Mac)](https://hits.zkitefly.eu.org/?tag=https://github.com/CeciliaStudio/PCL.Mac&web=true)
 </div>
 
 ## 简介
 
 PCL.Mac 是使用 SwiftUI 框架重构的 [Plain Craft Launcher](https://github.com/Hex-Dragon/PCL2)，支持 macOS 平台。<br>
 支持与主线 (PCL) 与[社区版](https://github.com/PCL-Community/PCL2-CE)一样的游戏安装（原版、Forge、Fabric、NeoForge）、Mod 下载与游戏管理。<br>
+
 可运行本启动器的最低系统版本为 `macOS 14.0`。
 
 ## 下载
 
-本项目尚处早期开发阶段，可从 [Actions](https://github.com/PCL-Community/PCL.Mac/actions) 下载开发版。
+本项目尚处早期开发阶段，可从 [Actions](https://github.com/CeciliaStudio/PCL.Mac/actions) 下载开发版。
 
 > [!WARNING]
 > 由于 App 未签名，直接打开可能会出现“已损坏”等提示。请：

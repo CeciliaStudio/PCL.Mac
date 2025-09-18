@@ -31,7 +31,7 @@ struct InstanceConfigView: View {
                     HStack {
                         Text("游戏内存")
                         MyTextField(text: $memoryText, numberOnly: true)
-                            .onChange(of: memoryText) {
+                            .onChange(of: memoryText) { _ in
                                 if let intValue = Int(memoryText) {
                                     instance.config.maxMemory = Int32(intValue)
                                     instance.saveConfig()
@@ -43,7 +43,7 @@ struct InstanceConfigView: View {
                         HStack {
                             Text("进程 QoS")
                             MyPicker(selected: $instance.config.qualityOfService, entries: qosOptions, textProvider: getQualityOfServiceName(_:))
-                            .onChange(of: instance.config.qualityOfService) {
+                            .onChange(of: instance.config.qualityOfService) { _ in
                                 instance.saveConfig()
                             }
                         }

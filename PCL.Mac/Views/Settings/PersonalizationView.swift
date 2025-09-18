@@ -27,7 +27,7 @@ struct PersonalizationView: View {
                                     content
                                 }
                             }
-                            .onChange(of: selectedTheme) {
+                            .onChange(of: selectedTheme) { _ in
                                 settings.themeId = selectedTheme.id
                             }
                             .padding()
@@ -54,7 +54,7 @@ struct PersonalizationView: View {
                                 content
                             }
                         }
-                        .onChange(of: settings.colorScheme) {
+                        .onChange(of: settings.colorScheme) { _ in
                             settings.updateColorScheme()
                         }
                     }

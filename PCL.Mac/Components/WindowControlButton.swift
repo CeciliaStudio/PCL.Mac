@@ -19,24 +19,6 @@ struct WindowControlButton: View {
         NSApplication.shared.terminate(nil)
     }
     
-    static let MacOSClose: WindowControlButton = .init{ isHovered in
-        Circle()
-            .fill(Color(hex: 0xFF5F57))
-            .overlay {
-                if isHovered {
-                    Image(systemName: "xmark")
-                        .resizable()
-                        .scaledToFit()
-                        .bold()
-                        .frame(width: 6)
-                        .foregroundStyle(Color(hex: 0x000000, alpha: 0.4))
-                }
-            }
-            .frame(width: 12)
-    } action: {
-        Close.action()
-    }
-    
     static let Miniaturize: WindowControlButton = .init(
     Image(systemName: "minus")
         .resizable()
@@ -46,24 +28,6 @@ struct WindowControlButton: View {
         .bold()
     ) {
         NSApplication.shared.windows.first!.miniaturize(nil)
-    }
-    
-    static let MacOSMiniaturize: WindowControlButton = .init{ isHovered in
-        Circle()
-            .fill(Color(hex: 0xFEBC2E))
-            .overlay {
-                if isHovered {
-                    Image(systemName: "minus")
-                        .resizable()
-                        .scaledToFit()
-                        .bold()
-                        .frame(width: 8)
-                        .foregroundStyle(Color(hex: 0x000000, alpha: 0.4))
-                }
-            }
-            .frame(width: 12)
-    } action: {
-        Miniaturize.action()
     }
     
     static let Back: WindowControlButton = .init(
@@ -78,24 +42,6 @@ struct WindowControlButton: View {
             DataManager.shared.router.removeLast()
         }
         DataManager.shared.router.removeLast()
-    }
-    
-    static let MacOSBack: WindowControlButton = .init{ isHovered in
-        Circle()
-            .fill(Color(hex: 0x28C840))
-            .overlay {
-                if isHovered {
-                    Image("Back")
-                        .resizable()
-                        .scaledToFit()
-                        .bold()
-                        .frame(width: 8)
-                        .foregroundStyle(Color(hex: 0x000000, alpha: 0.4))
-                }
-            }
-            .frame(width: 12)
-    } action: {
-        Back.action()
     }
     
     let action: () -> Void

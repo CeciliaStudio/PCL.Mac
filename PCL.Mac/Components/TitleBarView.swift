@@ -42,10 +42,6 @@ struct GenericTitleBarView<Content: View>: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .contentShape(Rectangle())
                 HStack(alignment: .center) {
-                    if AppSettings.shared.windowControlButtonStyle == .macOS {
-                        WindowControlButton.MacOSClose
-                        WindowControlButton.MacOSMiniaturize
-                    }
                     content()
                     Spacer()
                     if AppSettings.shared.windowControlButtonStyle == .pcl {
@@ -94,12 +90,8 @@ struct SubviewTitleBarView: View {
 
     var body: some View {
         GenericTitleBarView {
-            switch AppSettings.shared.windowControlButtonStyle {
-            case .pcl:
-                WindowControlButton.Back
-            case .macOS:
-                WindowControlButton.MacOSBack
-            }
+            WindowControlButton.Back
+                .padding(.leading, AppSettings.shared.windowControlButtonStyle == .macOS ? 40 : 0)
             Text(dataManager.router.getLast().title)
                 .font(.custom("PCL English", size: 16))
                 .foregroundStyle(.white)

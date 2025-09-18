@@ -51,7 +51,7 @@ struct NewAccountView: View {
             }
             Spacer()
         }
-        .onChange(of: state.type) {
+        .onChange(of: state.type) { _ in
             isAppeared = true
         }
         .animation(.spring(response: 0.3, dampingFraction: 0.85), value: state.type)
@@ -117,7 +117,7 @@ fileprivate struct NewOfflineAccountView: View {
                     MyTip(text: warningText, color: .red)
                 }
                 MyTextField(text: $state.playerName, placeholder: "玩家名")
-                    .onChange(of: state.playerName) {
+                    .onChange(of: state.playerName) { _ in
                         warningText = checkPlayerName(state.playerName)
                     }
                     .onSubmit(addAccount)
@@ -277,7 +277,7 @@ fileprivate struct NewYggdrasilAccountView: View {
                     HStack {
                         Text("验证服务器")
                         MyTextField(text: $authenticationServer, placeholder: "例如 https://littleskin.cn/api/yggdrasil")
-                            .onChange(of: authenticationServer) {
+                            .onChange(of: authenticationServer) { _ in
                                 if !isValidServer(authenticationServer) {
                                     errorMessage = "输入的 URL 无效！"
                                     return

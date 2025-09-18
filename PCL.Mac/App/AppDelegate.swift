@@ -6,15 +6,54 @@
 //
 
 import Cocoa
+import SwiftUI
+
+class Window: NSWindow {
+    init(contentView: NSView) {
+        super.init(
+            contentRect: NSRect(x: 0, y: 0, width: 1000, height: 600),
+            styleMask: [.titled, .closable, .resizable, .miniaturizable, .fullSizeContentView],
+            backing: .buffered,
+            defer: false
+        )
+        self.titleVisibility = .hidden
+        self.titlebarAppearsTransparent = true
+        self.isOpaque = false
+        self.backgroundColor = NSColor.clear
+        self.level = .normal
+        self.hasShadow = true
+        self.contentView = contentView
+        self.center()
+    }
+    
+    override func layoutIfNeeded() {
+        super.layoutIfNeeded()
+        if let close = self.standardWindowButton(.closeButton),
+           let min = self.standardWindowButton(.miniaturizeButton),
+           let zoom = self.standardWindowButton(.zoomButton) {
+            
+            if AppSettings.shared.windowControlButtonStyle == .macOS {
+                close.frame.origin = CGPoint(x: 16, y: -4)
+            } else {
+                close.frame.origin = CGPoint(x: 64, y: 64)
+            }
+            min.frame.origin = CGPoint(x: close.frame.maxX + 6, y: close.frame.minY)
+            zoom.frame.origin = CGPoint(x: 64, y: 64)
+        }
+    }
+}
 
 class AppDelegate: NSObject, NSApplicationDelegate {
+    private static let exitFlagURL = SharedConstants.shared.applicationSupportURL.appending(path: ".exit.flag")
+    var window: Window!
+    
     // MARK: 注册字体
     private func registerCustomFonts() {
         guard let fontURL = Bundle.main.url(forResource: "PCL", withExtension: "ttf") else {
             err("Bundle 内未找到字体")
             return
         }
-
+        
         var error: Unmanaged<CFError>?
         if CTFontManagerRegisterFontsForURL(fontURL as CFURL, .process, &error) == false {
             if let error = error?.takeUnretainedValue() {
@@ -63,6 +102,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if !FileManager.default.fileExists(atPath: SharedConstants.shared.temperatureURL.path) {
             try? FileManager.default.createDirectory(at: SharedConstants.shared.temperatureURL, withIntermediateDirectories: true)
         }
+        FileManager.default.createFile(atPath: Self.exitFlagURL.path, contents: nil)
         LogStore.shared.clear()
         let start = Date().timeIntervalSince1970
         log("App 已启动")
@@ -77,6 +117,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         let daemonProcess = Process()
         daemonProcess.executableURL = SharedConstants.shared.applicationResourcesURL.appending(path: "daemon")
+        daemonProcess.arguments = [
+            String(describing: ProcessInfo.processInfo.processIdentifier),
+            Self.exitFlagURL.path
+        ]
         do {
             try daemonProcess.run()
             log("守护进程已启动")
@@ -86,6 +130,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func applicationDidFinishLaunching(_ notification: Notification) {
+        let swiftUIView = ContentView()
+        let hostingView = NSHostingView(rootView: swiftUIView)
+        hostingView.wantsLayer = true
+        hostingView.layer?.cornerRadius = 10
+        hostingView.layer?.masksToBounds = true
+        window = Window(contentView: hostingView)
+        window.makeKeyAndOrderFront(nil)
+        
         if AppSettings.shared.showPclMacPopup {
             Task {
                 if await PopupManager.shared.showAsync(
@@ -98,12 +150,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        try? FileManager.default.removeItem(at: Self.exitFlagURL)
         LogStore.shared.save()
-        CacheStorage.default.save()
-        Task {
-            NSApplication.shared.reply(toApplicationShouldTerminate: true)
-        }
-        return .terminateLater
+        return .terminateNow
     }
     
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {

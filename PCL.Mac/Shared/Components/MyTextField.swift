@@ -34,7 +34,7 @@ struct MyTextField: View {
                 }
             }
             .focused($isFocused)
-            .onChange(of: text) {
+            .onChange(of: text) { _ in
                 if numberOnly {
                     text = text.filter { $0.isNumber }
                 }

@@ -13,9 +13,9 @@
 		EC3C3C4F2E2134A90033107E /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = EC3C3C4E2E2134A90033107E /* SwiftyJSON */; };
 		EC422DAB2E2082D900FE8309 /* PCL_Mac_Core.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC422DA32E2082D900FE8309 /* PCL_Mac_Core.framework */; };
 		EC422DAD2E2082D900FE8309 /* PCL_Mac_Core.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EC422DA32E2082D900FE8309 /* PCL_Mac_Core.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		EC4E6C802E438E6600F0871D /* daemon in Resources */ = {isa = PBXBuildFile; fileRef = EC4E6C7F2E438E6600F0871D /* daemon */; };
 		EC9507372DFCF17700018EE0 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = EC9507362DFCF17700018EE0 /* SwiftyJSON */; };
 		EC98618D2E3E09DC00C0E6F2 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = EC98618C2E3E09DC00C0E6F2 /* SwiftyJSON */; };
+		EC99F3162E7C27390031C5C4 /* daemon in Resources */ = {isa = PBXBuildFile; fileRef = EC99F3152E7C27390031C5C4 /* daemon */; };
 		ECDBF0CC2E1124C500E81482 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = ECDBF0CB2E1124C500E81482 /* ZIPFoundation */; };
 		ECFF69BD2E542EE8000625FA /* TOMLKit in Frameworks */ = {isa = PBXBuildFile; productRef = ECFF69BC2E542EE8000625FA /* TOMLKit */; };
 		ECFF69BF2E542EFF000625FA /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = ECFF69BE2E542EFF000625FA /* ZIPFoundation */; };
@@ -269,7 +269,7 @@
 				EC23B6322DE5DC5B00CBEA9C /* PCL.ttf */,
 				EC01E7E62DDC3BEA006EF529 /* log4j2.xml */,
 				EC01E7E72DDC3BEA006EF529 /* log4j2-1.12-.xml */,
-				EC4E6C7F2E438E6600F0871D /* daemon */,
+				EC99F3152E7C27390031C5C4 /* daemon */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -458,7 +458,7 @@
 			files = (
 				EC01E7E82DDC3BEA006EF529 /* log4j2.xml in Resources */,
 				EC23B6332DE5DC5B00CBEA9C /* PCL.ttf in Resources */,
-				EC4E6C802E438E6600F0871D /* daemon in Resources */,
+				EC99F3162E7C27390031C5C4 /* daemon in Resources */,
 				EC01E7E92DDC3BEA006EF529 /* log4j2-1.12-.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -730,7 +730,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.ceciliastudio.PCL.Mac;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -764,7 +764,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.ceciliastudio.PCL.Mac;
 				PRODUCT_NAME = "$(TARGET_NAME)";
