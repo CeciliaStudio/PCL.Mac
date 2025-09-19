@@ -20,14 +20,10 @@ struct DebugView: View {
                 PopupManager.shared.show(.init(.normal, "测试", "这是一行文本\n这也是一行文本\n这是一行很\(String(repeating: "长", count: 50))的文本", [.ok]))
             }
             .frame(height: 40)
-            .padding()
-            .padding(.bottom, -23)
             MyButton(text: "测试错误弹出框") {
                 PopupManager.shared.show(.init(.error, "测试", "这是一行文本\n这也是一行文本\n这是一行很\(String(repeating: "长", count: 50))的文本", [.ok]))
             }
             .frame(height: 40)
-            .padding()
-            .padding(.bottom, -23)
             MyButton(text: "测试提示") {
                 switch hintClickCount % 3 {
                 case 0:
@@ -42,14 +38,14 @@ struct DebugView: View {
                 hintClickCount += 1
             }
             .frame(height: 40)
-            .padding()
-            .padding(.bottom, -23)
             MyButton(text: "测试配色方案更换") {
                 settings.colorScheme = (settings.colorScheme == .light ? .dark : .light)
             }
             .frame(height: 40)
-            .padding()
-            .padding(.bottom, -23)
+            MyButton(text: "崩溃") {
+                fatalError()
+            }
+            .frame(height: 40)
             MyComboBox(
                 options: [ColorSchemeOption.light, ColorSchemeOption.dark, ColorSchemeOption.system],
                 selection: $settings.colorScheme,
@@ -63,5 +59,6 @@ struct DebugView: View {
                 .padding()
             Spacer()
         }
+        .padding()
     }
 }
