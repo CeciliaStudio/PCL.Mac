@@ -96,21 +96,6 @@ struct InstanceListView: View {
                             .padding(.bottom, 5)
                     }
                     Spacer()
-                    if isHovered {
-                        HStack {
-                            Image(systemName: "xmark")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 10)
-                                .bold()
-                                .foregroundStyle(AppSettings.shared.theme.getTextStyle())
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-//                                    deleteInstance()
-                                }
-                        }
-                        .padding(.trailing, 12)
-                    }
                 }
             }
             .onTapGesture {

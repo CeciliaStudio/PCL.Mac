@@ -11,7 +11,7 @@ import SwiftyJSON
 
 public class ForgeInstaller {
     private let minecraftDirectory: MinecraftDirectory
-    private let versionPath: URL
+    private let instanceURL: URL
     private let manifest: ClientManifest
     private let temp: TemperatureDirectory
     private var installProfile: ForgeInstallProfile?
@@ -20,9 +20,9 @@ public class ForgeInstaller {
     private var updateProgress: ((Double) -> Void)?
     private var progress: Double = 0
     
-    public init(_ minecraftDirectory: MinecraftDirectory, _ versionPath: URL, _ manifest: ClientManifest, updateProgress: ((Double) -> Void)? = nil) {
+    public init(_ minecraftDirectory: MinecraftDirectory, _ instanceURL: URL, _ manifest: ClientManifest, updateProgress: ((Double) -> Void)? = nil) {
         self.minecraftDirectory = minecraftDirectory
-        self.versionPath = versionPath
+        self.instanceURL = instanceURL
         self.manifest = manifest
         self.updateProgress = updateProgress
         self.temp = .init(name: "ForgeInstall")
@@ -51,7 +51,7 @@ public class ForgeInstaller {
         // 创建默认键值对
         values["SIDE"] = "client"
         values["INSTALLER"] = temp.root.appending(path: "installer.jar").path
-        values["MINECRAFT_JAR"] = versionPath.appending(path: "\(versionPath.lastPathComponent).jar").path
+        values["MINECRAFT_JAR"] = instanceURL.appending(path: "\(instanceURL.lastPathComponent).jar").path
         values["MINECRAFT_VERSION"] = values["MINECRAFT_JAR"]!
         values["ROOT"] = minecraftDirectory.rootURL.path
         values["LIBRARY_DIR"] = minecraftDirectory.librariesURL.path
@@ -198,15 +198,16 @@ public class ForgeInstaller {
     }
     
     // MARK: - 拷贝客户端清单
-    private func copyManifest(version: MinecraftVersion) throws {
+    private func copyManifest(version: MinecraftVersion) async throws {
         try loadInstallProfile()
-        let manifestURL = versionPath.appending(path: "\(versionPath.lastPathComponent).json")
+        let manifestURL = instanceURL.appending(path: "\(instanceURL.lastPathComponent).json")
         
-        // 若 inheritsFrom 对应的版本 JSON 不存在，复制
+        // 若 inheritsFrom 对应的版本 JSON 不存在，下载
         let baseManifestURL = minecraftDirectory.versionsURL.appending(path: version.displayName).appending(path: "\(version.displayName).json")
         if !FileManager.default.fileExists(atPath: baseManifestURL.path) {
             try? FileManager.default.createDirectory(at: baseManifestURL.parent(), withIntermediateDirectories: true)
-            try FileManager.default.copyItem(at: manifestURL, to: baseManifestURL)
+            let _ = try await MinecraftInstaller.downloadClientManifest(version: version, instanceURL: baseManifestURL.parent())
+            try? FileManager.default.copyItem(at: baseManifestURL, to: instanceURL.appending(path: ".parent"))
         }
         
         try FileManager.default.removeItem(at: manifestURL)
@@ -247,7 +248,7 @@ public class ForgeInstaller {
     // MARK: - 安装函数
     public func install(minecraftVersion: MinecraftVersion, forgeVersion: String) async throws {
         try await downloadInstaller(minecraftVersion: minecraftVersion, version: forgeVersion)
-        try copyManifest(version: minecraftVersion)
+        try await copyManifest(version: minecraftVersion)
         try await parseValues()
         try await downloadDependencies()
         
