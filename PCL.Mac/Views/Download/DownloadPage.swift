@@ -109,7 +109,7 @@ struct DownloadPage: View {
                         }
                         
                         if DataManager.shared.inprogressInstallTasks != nil { return }
-                        let directory = AppSettings.shared.currentMinecraftDirectory!
+                        let directory = AppSettings.shared.currentMinecraftDirectory
                         let instanceURL = directory.versionsURL.appending(path: name)
                         
                         // 如果选择了加载器，添加加载器安装任务

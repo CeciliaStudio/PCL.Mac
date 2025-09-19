@@ -79,7 +79,7 @@ public class InstallTask: ObservableObject, Identifiable, Hashable, Equatable {
     
     final func setRemainingFiles(_ value: Int) { DispatchQueue.main.async { self.remainingFiles = value } }
     
-    final func setProgress(_ value: Double) { DispatchQueue.main.async { self.currentStageProgress = value} }
+    final func setProgress(_ value: Double) { DispatchQueue.main.async { self.currentStageProgress = value } }
     
     final func increaseProgress(_ value: Double) { setProgress(currentStageProgress + value) }
     

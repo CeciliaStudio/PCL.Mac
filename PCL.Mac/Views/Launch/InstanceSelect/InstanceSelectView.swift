@@ -24,7 +24,7 @@ struct InstanceSelectView: View, SubRouteContainer {
             dataManager.leftTab(300) {
                 LeftTab()
             }
-            dataManager.router.append(.versionList(directory: AppSettings.shared.currentMinecraftDirectory!))
+            dataManager.router.append(.versionList(directory: AppSettings.shared.currentMinecraftDirectory))
         }
     }
 }
@@ -103,7 +103,7 @@ fileprivate struct LeftTab: View {
         }
         
         do {
-            let importer = try ModrinthModpackImporter(minecraftDirectory: settings.currentMinecraftDirectory.unwrap(), modpackURL: url)
+            let importer = try ModrinthModpackImporter(minecraftDirectory: settings.currentMinecraftDirectory, modpackURL: url)
             let index = try importer.loadIndex()
             let tasks = try importer.createInstallTasks()
             dataManager.inprogressInstallTasks = tasks

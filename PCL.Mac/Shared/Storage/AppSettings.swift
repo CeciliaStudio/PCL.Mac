@@ -145,7 +145,7 @@ public class AppSettings: ObservableObject {
         minecraftDirectories.removeAll(where: { $0.rootURL == url })
         
         if minecraftDirectories.isEmpty {
-            minecraftDirectories.append(currentMinecraftDirectory!)
+            minecraftDirectories.append(currentMinecraftDirectory)
         }
         
         DataManager.shared.objectWillChange.send()
