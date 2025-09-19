@@ -23,7 +23,7 @@ fileprivate struct ProjectVersionListView: View {
                 let versions: [ProjectVersion] = versionMap[key]!
                 MyCard(title: getCardTitle(key.loader, key.minecraftVersion)) {
                     LazyVStack(alignment: .leading, spacing: 0) {
-                        if let version = versions.first,
+                        if summary.type != .modpack, let version = versions.first,
                            !version.dependencies.isEmpty {
                             Text("前置资源")
                                 .font(.custom("PCL English", size: 14))
@@ -41,7 +41,7 @@ fileprivate struct ProjectVersionListView: View {
                         ForEach(versions) { version in
                             ProjectVersionListItem(version: version)
                                 .onTapGesture {
-                                    state.addToQueue(version)
+                                    onVersionClick(version)
                                 }
                         }
                     }
@@ -52,13 +52,54 @@ fileprivate struct ProjectVersionListView: View {
         }
         .task(id: requestID) {
             do {
-                let map = try await ModrinthProjectSearcher.shared.getVersionMap(id: summary.modId)
+                let map = try await ModrinthProjectSearcher.shared.getVersionMap(id: summary.modId, fetchDependencies: summary.type != .modpack)
                 DispatchQueue.main.async {
                     self.versionMap = map
                 }
             } catch {
                 err("无法加载版本列表: \(error.localizedDescription)")
             }
+        }
+    }
+    
+    private func onVersionClick(_ version: ProjectVersion) {
+        if summary.type == .modpack {
+            // 下载整合包
+            let modpackURL = SharedConstants.shared.temperatureURL.appending(path: version.name)
+            let modpackDownloadTask: InstallTask = CustomFileDownloadTask(url: version.downloadURL, destination: modpackURL)
+            let tasks = InstallTasks.single(modpackDownloadTask)
+            dataManager.inprogressInstallTasks = tasks
+            tasks.startAll { result in
+                switch result {
+                case .success(_):
+                    installModpack(url: modpackURL)
+                case .failure(let failure):
+                    hint("下载整合包失败: \(failure.localizedDescription)", .critical)
+                }
+            }
+        } else {
+            state.addToQueue(version)
+        }
+    }
+    
+    private func installModpack(url: URL) {
+        do {
+            let importer: ModrinthModpackImporter = try .init(minecraftDirectory: AppSettings.shared.currentMinecraftDirectory, modpackURL: url)
+            let index: ModrinthModpackIndex = try importer.loadIndex()
+            let tasks: InstallTasks = try importer.createInstallTasks()
+            dataManager.inprogressInstallTasks = tasks
+            tasks.startAll { result in
+                switch result {
+                case .success(_):
+                    hint("整合包 \(index.name) 安装成功！", .finish)
+                case .failure(let failure):
+                    PopupManager.shared.show(.init(.error, "安装整合包失败", "\(failure.localizedDescription)\n若要寻求帮助，请进入设置 > 其它 > 打开日志，将选中的文件发给别人，而不是发送此页面的照片或截图。", [.ok]))
+                }
+                try? FileManager.default.removeItem(at: url)
+            }
+        } catch {
+            err("创建安装任务失败: \(error.localizedDescription)")
+            PopupManager.shared.show(.init(.error, "无法创建安装任务", "\(error.localizedDescription)\n若要寻求帮助，请进入设置 > 其它 > 打开日志，将选中的文件发给别人，而不是发送本页面的照片或截图。", [.ok]))
         }
     }
     

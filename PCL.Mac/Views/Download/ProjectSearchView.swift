@@ -97,12 +97,12 @@ struct ProjectListItem: View {
                     Spacer()
                 }
                 Spacer()
-                if isHovered {
-                    Image(systemName: "plus.circle")
+                if isHovered && summary.type != .modpack {
+                    Image("PlusIcon")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 16)
-                        .foregroundStyle(Color(hex: 0x8C8C8C))
+                        .foregroundStyle(AppSettings.shared.theme.getTextStyle())
                         .padding(.trailing)
                         .contentShape(Circle())
                         .onTapGesture {
@@ -377,7 +377,7 @@ struct ProjectQueueOverlay: View {
                                 return
                             }
                             let versions = state.pendingDownloadProjects
-                            let tasks: InstallTasks = .single(ResourceInstallTask(instance: instance, versions: versions))
+                            let tasks: InstallTasks = .single(ResourceDownloadTask(instance: instance, versions: versions))
                             DataManager.shared.inprogressInstallTasks = tasks
                             tasks.startAll { result in
                                 switch result {

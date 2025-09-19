@@ -68,7 +68,7 @@ public class AppSettings: ObservableObject {
     @CodableAppStorage("lastVersionManifest") public var lastVersionManifest: VersionManifest? = nil
     
     /// 当前 MinecraftDirectory
-    @CodableAppStorage("currentMinecraftDirectory") public var currentMinecraftDirectory: MinecraftDirectory? = .default
+    @CodableAppStorage("currentMinecraftDirectory") public var currentMinecraftDirectory: MinecraftDirectory! = .default
     
     /// 所有 MinecraftDirectory
     @CodableAppStorage("minecraftDirectories") public var minecraftDirectories: [MinecraftDirectory] = [.default]

@@ -9,13 +9,14 @@ import Foundation
 import SwiftyJSON
 
 public enum ProjectType: String {
-    case mod, resourcepack, shader
+    case mod, resourcepack, shader, modpack
     
     public func getName() -> String {
         switch self {
         case .mod: "Mod"
         case .resourcepack: "资源包"
         case .shader: "光影包"
+        case .modpack: "整合包"
         }
     }
 }
@@ -81,7 +82,7 @@ public class ModrinthProjectSearcher {
         )
     }
     
-    public func getVersionMap(id: String) async throws -> ProjectVersionMap {
+    public func getVersionMap(id: String, fetchDependencies: Bool = true) async throws -> ProjectVersionMap {
         let json = try await Requests.get("https://api.modrinth.com/v2/project/\(id)/version").getJSONOrThrow()
         let summary = try await get(json.arrayValue[0]["project_id"].stringValue)
         var versionMap: ProjectVersionMap = [:]
@@ -97,7 +98,7 @@ public class ModrinthProjectSearcher {
                 updateDate: dateFormatter.date(from: version["date_published"].stringValue)!,
                 gameVersions: version["game_versions"].arrayValue.map { MinecraftVersion(displayName: $0.stringValue) },
                 loaders: version["loaders"].arrayValue.map { ClientBrand(rawValue: $0.stringValue) ?? .vanilla },
-                dependencies: await getDependencies(version),
+                dependencies: fetchDependencies ? await getDependencies(version) : [],
                 downloadURL: version["files"].arrayValue.first!["url"].url!
             )
             

@@ -50,7 +50,7 @@ struct DownloadView: View {
                         .padding(.top, 32)
                         .padding(.bottom, 4)
                     MyList(
-                        cases: [.projectSearch(type: .mod), .projectSearch(type: .resourcepack)],
+                        cases: [.projectSearch(type: .mod), .projectSearch(type: .resourcepack), .projectSearch(type: .modpack)],
                         animationIndex: 2
                     ) { type, isSelected in
                         createListItemView(type)
@@ -77,6 +77,8 @@ struct DownloadView: View {
                 imageName = "PictureIcon"
             case .shader:
                 imageName = "ModDownloadIcon"
+            case .modpack:
+                imageName = "BoxIcon"
             }
             text = type.getName()
         default:
