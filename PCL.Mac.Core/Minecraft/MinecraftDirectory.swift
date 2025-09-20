@@ -87,6 +87,13 @@ public class MinecraftDirectory: Codable, Identifiable, Hashable, ObservableObje
             }
         }
     }
+    
+    public class Config: Codable {
+        public var defaultInstance: String?
+        public var enableSymbolicLink: Bool = false
+        
+        public init() {}
+    }
 }
 
 public struct InstanceInfo: Identifiable, Hashable {

@@ -62,7 +62,8 @@ public class MinecraftInstallTask: InstallTask {
             try JSONSerialization.data(withJSONObject: dict, options: .prettyPrinted).write(to: manifestURL)
             
             // 初始化实例
-            let instance = MinecraftInstance.create(instanceURL, config: MinecraftConfig(version: version))
+            let instance = MinecraftInstance.create(instanceURL, config: MinecraftConfig())
+            instance?.config.minecraftVersion = version.displayName
             instance?.saveConfig()
         } catch {
             try? FileManager.default.removeItem(at: instanceURL)

@@ -63,8 +63,6 @@ public class MinecraftInstance: Identifiable, Equatable, Hashable {
         log("已清理实例缓存: \(runningDirectory.lastPathComponent)")
     }
     
-
-    
     private init(runningDirectory: URL, config: MinecraftConfig? = nil) {
         self.runningDirectory = runningDirectory
         self.minecraftDirectory = .init(rootURL: runningDirectory.parent().parent(), name: nil)
@@ -73,35 +71,36 @@ public class MinecraftInstance: Identifiable, Equatable, Hashable {
     }
     
     private func setup() -> Bool {
-        // 若配置文件存在，从文件加载配置
-        if FileManager.default.fileExists(atPath: configPath.path) {
-            do {
-                try loadConfig()
-            } catch {
-                err("无法加载配置: \(error.localizedDescription)")
-                debug(configPath.path)
-            }
-        }
-        self.config = config ?? MinecraftConfig(version: nil)
+        self.config = self.config ?? loadConfig() ?? MinecraftConfig()
         
         if !loadManifest() { return false }
-        if let version = config.minecraftVersion {
+        if let version = self.config.minecraftVersion {
             self.version = .init(displayName: version)
         } else {
             detectVersion()
-            config.minecraftVersion = version.displayName
+            self.config.minecraftVersion = version.displayName
         }
         
         // 寻找可用 Java
-        if self.config.javaURL == nil, let jvm = MinecraftInstance.findSuitableJava(self.version!) {
+        if self.config.javaURL == nil, let jvm = MinecraftInstance.findSuitableJava(version) {
             self.config.javaURL = jvm.executableURL
         }
-        self.saveConfig()
+        saveConfig()
         return true
     }
     
-    public func loadConfig() throws {
-        self.config = .init(try .init(data: try FileHandle(forReadingFrom: configPath).readToEnd()!))
+    public func loadConfig() -> MinecraftConfig? {
+        let decoder = JSONDecoder()
+        do {
+            let config = try decoder.decode(MinecraftConfig.self, from: FileHandle(forReadingFrom: configPath).readToEnd().unwrap())
+            if config.javaURL != nil && !config.javaURL.isFileURL {
+                config.javaURL = URL(fileURLWithPath: config.javaURL.path)
+            }
+            return config
+        } catch {
+            err("无法加载配置: \(error.localizedDescription)")
+            return nil
+        }
     }
     
     public func saveConfig() {
@@ -167,6 +166,7 @@ public class MinecraftInstance: Identifiable, Equatable, Hashable {
     
     public func launch(_ launchOptions: LaunchOptions, _ launchState: LaunchState) async {
         config.lastLaunch = Date()
+        saveConfig()
         // 登录账号
         await launchState.setStage(.login)
         if let account = launchOptions.account {
@@ -284,50 +284,14 @@ public class MinecraftInstance: Identifiable, Equatable, Hashable {
 }
 
 public class MinecraftConfig: Codable {
-    public var additionalLibraries: Set<String> = []
-    public var javaURL: URL! {
-        get {
-            return javaURLString == "" ? nil : URL(fileURLWithPath: javaURLString)
-        }
-        set (value) {
-            javaURLString = value.path
-        }
-    }
+    public var javaURL: URL!
     public var skipResourcesCheck: Bool = false
     public var maxMemory: Int32 = 4096
     public var qualityOfService: QualityOfService = .default
     public var minecraftVersion: String!
     public var lastLaunch: Date?
     
-    private var javaURLString: String
-    
-    enum CodingKeys: String, CodingKey {
-        case additionalLibraries
-        case javaURLString = "javaURL"
-        case skipResourcesCheck
-        case maxMemory
-        case qualityOfService
-        case minecraftVersion
-        case lastLaunch
-    }
-    
-    public init(_ json: JSON) {
-        self.additionalLibraries = .init(json["additionalLibraries"].array?.map { $0.stringValue } ?? [])
-        self.javaURLString = json["javaURL"].stringValue // 旧版本字段
-        self.skipResourcesCheck = json["skipResourcesCheck"].boolValue
-        self.maxMemory = json["maxMemory"].int32 ?? 4096
-        self.qualityOfService = .init(rawValue: json["qualityOfService"].intValue) ?? .default
-        self.minecraftVersion = json["minecraftVersion"].stringValue
-        self.lastLaunch = json["lastLaunch"].double.map { Date(timeIntervalSince1970: $0) }
-        if qualityOfService.rawValue == 0 {
-            qualityOfService = .default
-        }
-    }
-    
-    public init(version: MinecraftVersion?) {
-        self.minecraftVersion = version?.displayName
-        self.javaURLString = ""
-    }
+    public init() {}
 }
 
 public enum ClientBrand: String, Codable, Hashable {
