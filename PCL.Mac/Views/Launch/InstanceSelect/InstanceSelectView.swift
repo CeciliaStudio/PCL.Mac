@@ -71,8 +71,9 @@ fileprivate struct LeftTab: View {
                             hint("该目录已存在！", .critical)
                             return
                         }
-                        settings.minecraftDirectories.append(.init(rootURL: panel.url!, name: "自定义目录"))
-                        settings.currentMinecraftDirectory = .init(rootURL: panel.url!, name: "自定义目录")
+                        let directory = MinecraftDirectory(rootURL: panel.url!, config: .init(name: "自定义目录"))
+                        settings.minecraftDirectories.append(directory)
+                        settings.currentMinecraftDirectory = directory
                         hint("添加成功", .finish)
                     }
                 }
@@ -134,7 +135,7 @@ fileprivate struct LeftTab: View {
         var body: some View {
             HStack {
                 VStack(alignment: .leading) {
-                    Text(directory.name ?? "")
+                    Text(directory.config.name)
                         .font(.custom("PCL English", size: 14))
                         .foregroundStyle(.primary)
                     Text(directory.rootURL.path)

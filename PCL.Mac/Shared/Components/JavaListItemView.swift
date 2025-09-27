@@ -13,23 +13,14 @@ struct JavaListItemView: View {
     let jvm: JavaVirtualMachine
     private var instance: MinecraftInstance? = nil
     private var javaPath: URL? {
-        guard let directory = AppSettings.shared.currentMinecraftDirectory,
-              let defaultInstance = AppSettings.shared.defaultInstance,
-              let instance = MinecraftInstance.create(directory.versionsURL.appending(path: defaultInstance)) else {
-            return nil
-        }
-        
-        return instance.config.javaURL
+        return dataManager.defaultInstance?.config.javaURL
     }
     
     init(jvm: JavaVirtualMachine) {
         self.jvm = jvm
-        guard let directory = AppSettings.shared.currentMinecraftDirectory,
-              let defaultInstance = AppSettings.shared.defaultInstance,
-              let instance = MinecraftInstance.create(directory.versionsURL.appending(path: defaultInstance)) else {
-            return
+        if let instance = dataManager.defaultInstance {
+            self.instance = instance
         }
-        self.instance = instance
     }
     
     var body: some View {

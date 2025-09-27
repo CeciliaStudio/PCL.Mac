@@ -62,7 +62,7 @@ public class MinecraftInstallTask: InstallTask {
             try JSONSerialization.data(withJSONObject: dict, options: .prettyPrinted).write(to: manifestURL)
             
             // 初始化实例
-            let instance = MinecraftInstance.create(instanceURL, config: MinecraftConfig())
+            let instance = MinecraftInstance.create(directory: minecraftDirectory, runningDirectory: instanceURL)
             instance?.config.minecraftVersion = version.displayName
             instance?.saveConfig()
         } catch {

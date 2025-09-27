@@ -37,16 +37,45 @@ public class MinecraftInstance: Identifiable, Equatable, Hashable {
         lhs.id == rhs.id
     }
     
-    public static func create(_ directory: MinecraftDirectory, _ name: String, config: MinecraftConfig? = nil) -> MinecraftInstance? {
-        create(directory.versionsURL.appending(path: name), config: config)
+    /// 初始化或从缓存中获取实例。
+    /// - Parameters:
+    ///   - directory: 实例所在的 `MinecraftDirectory`，在资源补全时会需要部分配置。
+    ///   - name: 实例目录名。
+    ///   - config: 实例初始配置。若缓存中存在该实例，则该参数被忽略。
+    ///   - doCache: 是否将实例放入缓存。
+    /// - Returns: 初始化或获取到的实例。如果实例初始化失败，返回 `nil`。
+    public static func create(
+        directory: MinecraftDirectory,
+        name: String,
+        config: MinecraftConfig? = nil,
+        doCache: Bool = true
+    ) -> MinecraftInstance? {
+        return create(
+            directory: directory,
+            runningDirectory: directory.versionsURL.appending(path: "name"),
+            config: config,
+            doCache: doCache
+        )
     }
     
-    public static func create(_ runningDirectory: URL, config: MinecraftConfig? = nil, doCache: Bool = true) -> MinecraftInstance? {
+    /// 初始化或从缓存中获取实例。
+    /// - Parameters:
+    ///   - directory: 实例所在的 `MinecraftDirectory`，在资源补全时会需要部分配置。
+    ///   - runningDirectory: 实例运行目录，存放 JSON 与 JAR。
+    ///   - config: 实例初始配置。若缓存中存在该实例，则该参数被忽略。
+    ///   - doCache: 是否将实例放入缓存。
+    /// - Returns: 初始化或获取到的实例。如果实例初始化失败，返回 `nil`。
+    public static func create(
+        directory: MinecraftDirectory,
+        runningDirectory: URL,
+        config: MinecraftConfig? = nil,
+        doCache: Bool = true
+    ) -> MinecraftInstance? {
         if let cached = cache[runningDirectory] {
             return cached
         }
         
-        let instance: MinecraftInstance = .init(runningDirectory: runningDirectory, config: config)
+        let instance: MinecraftInstance = .init(directory: directory, runningDirectory: runningDirectory, config: config)
         if instance.setup() {
             if doCache {
                 cache[runningDirectory] = instance
@@ -63,9 +92,9 @@ public class MinecraftInstance: Identifiable, Equatable, Hashable {
         log("已清理实例缓存: \(runningDirectory.lastPathComponent)")
     }
     
-    private init(runningDirectory: URL, config: MinecraftConfig? = nil) {
+    private init(directory: MinecraftDirectory, runningDirectory: URL, config: MinecraftConfig? = nil) {
         self.runningDirectory = runningDirectory
-        self.minecraftDirectory = .init(rootURL: runningDirectory.parent().parent(), name: nil)
+        self.minecraftDirectory = directory
         self.configPath = runningDirectory.appending(path: ".PCL_Mac.json")
         self.config = config
     }
