@@ -34,23 +34,20 @@ jobs:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
           THEME_KEY: ${{ secrets.THEME_KEY }}
 
-      - name: Build Universal Binary (xcodebuild)
+      - name: Build Universal Binary
         run: |
-          PROJECT="PCL.Mac.xcodeproj"
-          SCHEME="PCL.Mac"
+          xcodebuild -project PCL.Mac.xcodeproj -scheme PCL.Mac -configuration Release -archivePath build \
+            -xcconfig Environment.xcconfig \
+            ARCHS="arm64 x86_64" ONLY_ACTIVE_ARCH=NO \
+            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO archive
 
-          if [ -d "$PROJECT" ]; then
-            xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Release -archivePath build \
-              -xcconfig Environment.xcconfig \
-              ARCHS="arm64 x86_64" ONLY_ACTIVE_ARCH=NO \
-              CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO archive
-          else
-            echo "PCL.Mac.xcodeproj not found!"
-            exit 1
-          fi
+      - name: Prepare app artifact directory
+        run: |
+          mkdir ./PCL.Mac
+          mv build.xcarchive/Products/Applications/PCL.Mac.app ./PCL.Mac/PCL.Mac.app
 
-      - name: Archive build products
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: PCL.Mac
-          path: build.xcarchive/Products/Applications/PCL.Mac.app
+          path: ./PCL.Mac
