@@ -151,13 +151,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         } else { // 确保不会两个 Popup 叠加
             Task {
                 let list = try await UpdateChecker.fetchVersions()
-                debug(UpdateChecker.isLauncherUpToDate(list: list))
                 if !UpdateChecker.isLauncherUpToDate(list: list) {
                     let latest = list.getLatestVersion()!
                     let changelogURL = URL(string: "https://gitee.com/yizhimcqiu/PCL.Mac.Releases/blob/main/changelog/\(latest.tag).md")!
                     await MainActor.run {
                         PopupManager.shared.show(
-                            .init(.normal, "PCL.Mac 有更新可用", "发现新版本 \(latest.name)\n更新日志：\(changelogURL.absoluteString)",
+                            .init(.normal, "PCL.Mac 有更新可用", "发现新版本 \(latest.name)\n发布时间：\(DateFormatters.shared.displayDateFormatter.string(from: latest.time))\n更新日志：\(changelogURL.absoluteString)",
                                   [.init(label: "打开更新日志", style: .normal, closeOnClick: false), .init(label: "跳过", style: .normal), .init(label: "更新", style: .accent)]),
                             callback: { id in
                                 if id == 0 {

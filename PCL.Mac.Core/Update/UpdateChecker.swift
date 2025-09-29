@@ -25,9 +25,9 @@ public class UpdateChecker {
         if AppSettings.shared.launcherVersionId == -1 {
             AppSettings.shared.launcherVersionId = version.id
         }
-//        if SharedConstants.shared.isDevelopment {
-//            return true
-//        }
+        if SharedConstants.shared.isDevelopment {
+            return true
+        }
         return list.getLatestVersion().id <= AppSettings.shared.launcherVersionId
     }
     
