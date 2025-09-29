@@ -17,8 +17,6 @@ public struct SharedConstants {
     public let temperatureURL: URL
     public let authlibInjectorURL: URL
     
-    public let dateFormatter = DateFormatter()
-    
     public let isDevelopment: Bool
     public let version: String
     public let branch: String
@@ -29,9 +27,6 @@ public struct SharedConstants {
         self.logURL = applicationSupportURL.appending(path: "Logs").appending(path: "app.log")
         self.temperatureURL = applicationSupportURL.appending(path: "Temp")
         self.authlibInjectorURL = applicationSupportURL.appending(path: "authlib-injector.jar")
-        
-        self.dateFormatter.dateFormat = "yyyy/MM/dd HH:mm"
-        self.dateFormatter.timeZone = TimeZone(identifier: "Asia/Shanghai")
         
         self.isDevelopment = Self.getInfoValueOrDefault(key: "IS_DEVELOPMENT", default: "true") == "true" ? true : false
         

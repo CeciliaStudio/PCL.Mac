@@ -1,0 +1,96 @@
+//
+//  UpdateChecker.swift
+//  PCL.Mac
+//
+//  Created by 温迪 on 2025/9/29.
+//
+
+import Foundation
+import SwiftyJSON
+import Cocoa
+
+public class UpdateChecker {
+    public static func fetchVersions() async throws -> LauncherVersionList {
+        let json: JSON = try await Requests.get(
+            "https://gitee.com/yizhimcqiu/PCL.Mac.Releases/raw/main/versions.json"
+        ).getJSONOrThrow()
+        
+        return LauncherVersionList(json: json)
+    }
+    
+    public static func isLauncherUpToDate(list: LauncherVersionList) -> Bool {
+        if SharedConstants.shared.isDevelopment || list.getVersion(name: SharedConstants.shared.version) == nil {
+            return true
+        }
+        return list.getLatestVersion().name == SharedConstants.shared.version
+    }
+    
+    public static func update(to version: LauncherVersion) async throws {
+        // 创建临时目录
+        let temp = TemperatureDirectory(name: "LauncherUpdate")
+        defer { temp.free() }
+        
+        // 下载 App 归档
+        let url = URL(string: "https://gitee.com/yizhimcqiu/PCL.Mac.Releases/raw/main")!
+            .appending(path: version.sha1.prefix(2)).appending(path: version.sha1)
+        let archiveURL = temp.getURL(path: "archive.zip")
+        try await SingleFileDownloader.download(url: url, destination: archiveURL)
+        try FileManager.default.unzipItem(at: archiveURL, to: temp.getURL(path: "launcher"))
+        let newAppURL = temp.getURL(path: "launcher/PCL.Mac.app")
+        
+        // 替换 App
+        try FileManager.default.removeItem(at: Bundle.main.bundleURL)
+        try FileManager.default.moveItem(at: newAppURL, to: Bundle.main.bundleURL)
+        temp.free()
+        
+        // 重启
+        let process = Process()
+        process.executableURL = Bundle.main.bundleURL
+            .appending(path: "Contents").appending(path: "MacOS").appending(path: "PCL.Mac")
+        try process.run()
+        await NSApp.terminate(nil)
+    }
+    
+    private init() {}
+}
+
+public struct LauncherVersion {
+    public let id: Int
+    public let tag: String
+    public let name: String
+    public let sha1: String
+    public let time: Date
+    
+    public init(json: JSON) {
+        self.id = json["id"].intValue
+        self.tag = json["tag"].stringValue
+        self.name = json["name"].stringValue
+        self.sha1 = json["sha1"].stringValue
+        self.time = DateFormatters.shared.iso8601Formatter.date(from: json["time"].stringValue)!
+    }
+}
+
+public struct LauncherVersionList {
+    public let latest: String
+    public let versions: [String: LauncherVersion]
+    
+    public init(json: JSON) {
+        self.latest = json["latest"].stringValue
+        self.versions = Dictionary(uniqueKeysWithValues: json["versions"].arrayValue.map {
+            let version = LauncherVersion(json: $0)
+            return (version.tag, version)
+        })
+    }
+    
+    public func getVersion(tag: String) -> LauncherVersion? {
+        return versions[tag]
+    }
+    
+    public func getVersion(name: String) -> LauncherVersion? {
+        return versions.values.first { $0.name == name }
+    }
+    
+    public func getLatestVersion() -> LauncherVersion! {
+        return versions[latest]
+    }
+}

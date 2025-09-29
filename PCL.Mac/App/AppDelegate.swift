@@ -115,6 +115,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         initJavaList()
         log("App 初始化完成, 耗时 \(Int((Date().timeIntervalSince1970 - start) * 1000))ms")
         
+#if !DEBUG
         let daemonProcess = Process()
         daemonProcess.executableURL = SharedConstants.shared.applicationResourcesURL.appending(path: "daemon")
         daemonProcess.arguments = [
@@ -127,9 +128,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         } catch {
             err("无法开启守护进程: \(error.localizedDescription)")
         }
+#endif
     }
     
     func applicationDidFinishLaunching(_ notification: Notification) {
+//        Task {
+//            let list = try await UpdateChecker.fetchVersions()
+//            try await UpdateChecker.update(to: list.getLatestVersion())
+//        }
         let swiftUIView = ContentView()
         let hostingView = NSHostingView(rootView: swiftUIView)
         hostingView.wantsLayer = true
