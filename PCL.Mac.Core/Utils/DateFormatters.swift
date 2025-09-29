@@ -5,7 +5,7 @@
 //  Created by 温迪 on 2025/9/29.
 //
 
-import  Foundation
+import Foundation
 
 public class DateFormatters {
     public static let shared: DateFormatters = .init()
