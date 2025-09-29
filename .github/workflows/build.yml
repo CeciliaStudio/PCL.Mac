@@ -43,11 +43,13 @@ jobs:
 
       - name: Prepare app artifact directory
         run: |
-          mkdir ./PCL.Mac
-          mv build.xcarchive/Products/Applications/PCL.Mac.app ./PCL.Mac/PCL.Mac.app
+          mkdir "PCL.Mac-$APP_VERSION"
+          mv build.xcarchive/Products/Applications/PCL.Mac.app "./PCL.Mac-$APP_VERSION/PCL.Mac.app"
+        env:
+          APP_VERSION: ${{ github.event.inputs.app_version }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: PCL.Mac
-          path: ./PCL.Mac
+          path: ./PCL.Mac-${{ github.event.inputs.app_version }}
