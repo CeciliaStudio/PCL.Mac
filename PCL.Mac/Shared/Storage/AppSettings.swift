@@ -100,6 +100,9 @@ public class AppSettings: ObservableObject {
     /// 版本列表源
     @CodableAppStorage("versionManifestSource") public var versionManifestSource: DownloadSourceOption = .both
     
+    /// 用于更新检查的启动器版本 id，更新或跳过更新后更改
+    @CodableAppStorage("launcherVersionId") public var launcherVersionId: Int = -1
+    
     public func updateColorScheme() {
         if colorScheme != .system {
             NSApp.appearance = colorScheme == .light ? NSAppearance(named: .aqua) : NSAppearance(named: .darkAqua)

@@ -19,10 +19,16 @@ public class UpdateChecker {
     }
     
     public static func isLauncherUpToDate(list: LauncherVersionList) -> Bool {
-        if SharedConstants.shared.isDevelopment || list.getVersion(name: SharedConstants.shared.version) == nil {
+        guard let version = list.getVersion(name: SharedConstants.shared.version) else {
             return true
         }
-        return list.getLatestVersion().name == SharedConstants.shared.version
+        if AppSettings.shared.launcherVersionId == -1 {
+            AppSettings.shared.launcherVersionId = version.id
+        }
+//        if SharedConstants.shared.isDevelopment {
+//            return true
+//        }
+        return list.getLatestVersion().id <= AppSettings.shared.launcherVersionId
     }
     
     public static func update(to version: LauncherVersion) async throws {
@@ -61,12 +67,22 @@ public struct LauncherVersion {
     public let sha1: String
     public let time: Date
     
+    public init(id: Int, tag: String, name: String, sha1: String, time: Date) {
+        self.id = id
+        self.tag = tag
+        self.name = name
+        self.sha1 = sha1
+        self.time = time
+    }
+    
     public init(json: JSON) {
-        self.id = json["id"].intValue
-        self.tag = json["tag"].stringValue
-        self.name = json["name"].stringValue
-        self.sha1 = json["sha1"].stringValue
-        self.time = DateFormatters.shared.iso8601Formatter.date(from: json["time"].stringValue)!
+        self.init(
+            id: json["id"].intValue,
+            tag: json["tag"].stringValue,
+            name: json["name"].stringValue,
+            sha1: json["sha1"].stringValue,
+            time: DateFormatters.shared.iso8601Formatter.date(from: json["time"].stringValue)!
+        )
     }
 }
 

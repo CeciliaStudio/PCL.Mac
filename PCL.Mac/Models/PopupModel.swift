@@ -29,6 +29,13 @@ struct PopupButtonModel: Identifiable, Hashable {
     let id: UUID = .init()
     let label: String
     let style: PopupButtonStyle
+    let closeOnClick: Bool
+    
+    init(label: String, style: PopupButtonStyle, closeOnClick: Bool = true) {
+        self.label = label
+        self.style = style
+        self.closeOnClick = closeOnClick
+    }
     
     static let close = PopupButtonModel(label: "关闭", style: .normal)
     static let ok = PopupButtonModel(label: "好的", style: .normal)
