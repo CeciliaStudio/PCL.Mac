@@ -9,8 +9,8 @@ import SwiftUI
 
 struct StopGameButtonOverlay: View {
     @ObservedObject private var dataManager: DataManager = .shared
+    @ObservedObject private var state: LaunchState
     @State private var isAppeared: Bool = false
-    private let state: LaunchState
     
     init(state: LaunchState) {
         self.state = state
@@ -28,9 +28,11 @@ struct StopGameButtonOverlay: View {
             dataManager.launchState = nil
         }
         .scaleEffect(isAppeared ? 1 : 0)
-        .onAppear {
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
-                isAppeared = true
+        .onChange(of: state.process) { _ in
+            if state.process != nil {
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
+                    isAppeared = true
+                }
             }
         }
     }

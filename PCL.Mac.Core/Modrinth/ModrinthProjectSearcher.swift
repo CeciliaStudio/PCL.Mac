@@ -33,7 +33,7 @@ public class ModrinthProjectSearcher {
     }
     
     public func get(_ id: String) async throws -> ProjectSummary {
-        return .init(json: try await Requests.get("https://api.modrinth.com/v2/project/\(id)", ignoredFailureStatusCodes: [404]).getJSONOrThrow())
+        return .init(json: try await Requests.get("https://api.modrinth.com/v2/project/\(id)").getJSONOrThrow())
     }
     
     private func getDependencies(_ json: JSON) async -> [ProjectDependency] {

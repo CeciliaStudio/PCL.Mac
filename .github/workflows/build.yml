@@ -1,9 +1,12 @@
 name: Build macOS App
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
+    inputs:
+      app_version:
+        description: 'App 版本'
+        required: true
+        default: '0.0.0'
 
 jobs:
   build:
@@ -11,26 +14,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up Xcode
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: latest
-
-      - name: Install dependencies (if using CocoaPods)
-        run: |
-          if [ -f "Podfile" ]; then
-            sudo gem install cocoapods
-            pod install
-          fi
       
-      - name: Generate Secrets.xcconfig
+      - name: Generate Environment.xcconfig
         run: |
-            echo "IS_DEVELOPMENT = false" >> Secrets.xcconfig
-            echo "BRANCH = $BRANCH" >> Secrets.xcconfig
+            echo "IS_DEVELOPMENT = false" >> Environment.xcconfig
+            echo "BRANCH = $BRANCH" >> Environment.xcconfig
+            echo "APP_VERSION = $APP_VERSION" >> Environment.xcconfig
         env:
-          CLIENT_ID: ${{ secrets.CLIENT_ID }}
           BRANCH: ${{ github.ref_name }}
+          APP_VERSION: ${{ github.event.inputs.app_version }}
     
       - name: Replace secrets
         run: |
@@ -42,43 +34,22 @@ jobs:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
           THEME_KEY: ${{ secrets.THEME_KEY }}
 
-      - name: Build Universal Binary (xcodebuild)
+      - name: Build Universal Binary
         run: |
-          PROJECT="PCL.Mac.xcodeproj"
-          SCHEME="PCL.Mac"
+          xcodebuild -project PCL.Mac.xcodeproj -scheme PCL.Mac -configuration Release -archivePath build \
+            -xcconfig Environment.xcconfig \
+            ARCHS="arm64 x86_64" ONLY_ACTIVE_ARCH=NO \
+            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO archive
 
-          if [ -d "$PROJECT" ]; then
-            xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Release -archivePath build \
-              -xcconfig Secrets.xcconfig \
-              ARCHS="arm64 x86_64" ONLY_ACTIVE_ARCH=NO \
-              CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO archive
-          else
-            echo "PCL.Mac.xcodeproj not found!"
-            exit 1
-          fi
-
-      - name: Copy .app to build/Release
+      - name: Prepare app artifact directory
         run: |
-          mkdir -p build/Release
-          APP_PATH="build.xcarchive/Products/Applications/PCL.Mac.app"
-          if [ -d "$APP_PATH" ]; then
-            cp -R "$APP_PATH" build/Release/
-          else
-            echo "PCL.Mac.app not found!"
-            exit 1
-          fi
+          mkdir "PCL.Mac-$APP_VERSION"
+          mv build.xcarchive/Products/Applications/PCL.Mac.app "./PCL.Mac-$APP_VERSION/PCL.Mac.app"
+        env:
+          APP_VERSION: ${{ github.event.inputs.app_version }}
 
-      - name: Verify Universal Binary
-        run: |
-          file build/Release/PCL.Mac.app/Contents/MacOS/PCL.Mac
-
-      - name: Zip PCL.Mac.app
-        run: |
-          cd build/Release
-          zip -r PCL.Mac.zip PCL.Mac.app
-
-      - name: Archive build products
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: PCL.Mac
-          path: build/Release/PCL.Mac.zip
+          path: ./PCL.Mac-${{ github.event.inputs.app_version }}

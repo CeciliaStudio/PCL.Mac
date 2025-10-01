@@ -17,10 +17,8 @@ public struct SharedConstants {
     public let temperatureURL: URL
     public let authlibInjectorURL: URL
     
-    public let dateFormatter = DateFormatter()
-    
     public let isDevelopment: Bool
-    public let version = "Beta 0.1.2"
+    public let version: String
     public let branch: String
     
     private init() {
@@ -30,11 +28,14 @@ public struct SharedConstants {
         self.temperatureURL = applicationSupportURL.appending(path: "Temp")
         self.authlibInjectorURL = applicationSupportURL.appending(path: "authlib-injector.jar")
         
-        self.dateFormatter.dateFormat = "yyyy/MM/dd HH:mm"
-        self.dateFormatter.timeZone = TimeZone(identifier: "Asia/Shanghai")
+        self.isDevelopment = Self.getInfoValueOrDefault(key: "IS_DEVELOPMENT", default: "true") == "true" ? true : false
         
-        self.isDevelopment = (Bundle.main.object(forInfoDictionaryKey: "IS_DEVELOPMENT") as! String) == "false" ? false : true
-        let branch = Bundle.main.object(forInfoDictionaryKey: "BRANCH") as! String
-        self.branch = branch.isEmpty ? "本地构建" : branch
+        self.version = Self.getInfoValueOrDefault(key: "APP_VERSION", default: "本地构建")
+        self.branch = Self.getInfoValueOrDefault(key: "BRANCH", default: "本地构建")
+    }
+    
+    private static func getInfoValueOrDefault(key: String, default: String) -> String {
+        let value: String = Bundle.main.object(forInfoDictionaryKey: key) as! String
+        return value.isEmpty ? `default` : value
     }
 }

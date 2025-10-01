@@ -84,6 +84,7 @@ public class MinecraftLauncher {
             }
             
             process.waitUntilExit()
+            pipe.fileHandleForReading.readabilityHandler = nil
             log("\(instance.name) 进程已退出, 退出代码 \(process.terminationStatus)")
             if process.terminationStatus == 0 {
                 debug("检测到退出代码为 0，已删除日志")

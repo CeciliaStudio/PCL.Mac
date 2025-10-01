@@ -19,7 +19,7 @@ fileprivate struct VersionView: View, Identifiable {
     init(version: VersionManifest.GameVersion, isLatest: Bool = false, parent: MinecraftDownloadView) {
         self.name = version.id
         
-        var description = SharedConstants.shared.dateFormatter.string(from: version.releaseTime)
+        var description = DateFormatters.shared.displayDateFormatter.string(from: version.releaseTime)
         if isLatest {
             description = "最新\(version.type == .release ? "正式" : "预览")版，发布于 " + description
         } else if version.type == .aprilFool {

@@ -38,11 +38,17 @@ class PopupManager: ObservableObject {
     
     func onClick(id: UUID) {
         if let currentPopup {
+            guard let buttonIndex = currentPopup.buttons.firstIndex(where: { $0.id == id }) else {
+                return
+            }
+            let button = currentPopup.buttons[buttonIndex]
             self.callback?(currentPopup.buttons.firstIndex(where: { $0.id == id }) ?? 0)
-            self.callback = nil
-            self.popupState = .afterCollapse
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                self.currentPopup = nil
+            if button.closeOnClick {
+                self.callback = nil
+                self.popupState = .afterCollapse
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    self.currentPopup = nil
+                }
             }
         }
     }

@@ -105,7 +105,7 @@ struct InstanceOverviewView: View {
                         Text(getVersionString())
                             .foregroundStyle(Color(hex: 0x8C8C8C))
                         if let lastLaunch = instance.config.lastLaunch {
-                            Text("上次启动：\(SharedConstants.shared.dateFormatter.string(from: lastLaunch))")
+                            Text("上次启动：\(DateFormatters.shared.displayDateFormatter.string(from: lastLaunch))")
                         }
                     }
                     .font(.custom("PCL English", size: 14))

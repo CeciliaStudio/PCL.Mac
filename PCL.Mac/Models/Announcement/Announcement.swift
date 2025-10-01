@@ -47,7 +47,7 @@ struct Announcement: Identifiable {
                     
                     HStack {
                         Spacer()
-                        Text("—— \(self.author) \(SharedConstants.shared.dateFormatter.string(from: self.time))")
+                        Text("—— \(self.author) \(DateFormatters.shared.displayDateFormatter.string(from: self.time))")
                             .foregroundStyle(Color(hex: 0x8C8C8C))
                             .font(.custom("PCL English", size: 12))
                     }

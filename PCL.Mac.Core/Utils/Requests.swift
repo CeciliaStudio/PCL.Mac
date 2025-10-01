@@ -26,9 +26,33 @@ public enum EncodeMethod {
 }
 
 public struct Response {
+    public let statusCode: Int?
+    public let headers: [String: String]
     public let data: Data?
-    public let json: JSON?
+    public var json: JSON? { try? _json.get() }
     public let error: Error?
+    private let _json: Result<JSON, Error>
+    
+    private init(statusCode: Int?, headers: [String : String], data: Data?, error: Error?) {
+        self.statusCode = statusCode
+        self.headers = headers
+        self.data = data
+        self.error = error
+        self._json = Result { try JSON(data: data.unwrap()) }
+    }
+    
+    public static func success(response: HTTPURLResponse, data: Data) -> Response {
+        let headers = response.allHeaderFields.reduce(into: [String: String]()) { result, entry in
+            if let key = entry.key as? String, let value = entry.value as? String {
+                result[key] = value
+            }
+        }
+        return Response(statusCode: response.statusCode, headers: headers, data: data, error: nil)
+    }
+    
+    public static func failure(error: Error) -> Response {
+        Response(statusCode: nil, headers: [:], data: nil, error: error)
+    }
     
     public func getDataOrThrow() throws -> Data {
         guard let data = self.data else {
@@ -39,7 +63,7 @@ public struct Response {
     }
     
     public func getJSONOrThrow() throws -> JSON {
-        return try JSON(data: getDataOrThrow())
+        return try _json.get()
     }
 }
 
@@ -49,17 +73,19 @@ public class Requests {
         method: String = "GET",
         headers: [String: String]? = nil,
         body: [String: Any]? = nil,
-        encodeMethod: EncodeMethod = .json,
-        ignoredFailureStatusCodes: [Int]
+        encodeMethod: EncodeMethod = .json
     ) async -> Response {
         do {
+            // 创建 URLRequest
             var request = URLRequest(url: url)
             request.httpMethod = method
             
+            // 设置请求头
             headers?.forEach { key, value in
                 request.setValue(value, forHTTPHeaderField: key)
             }
             
+            // 设置请求体
             if let body = body {
                 switch encodeMethod {
                 case .json:
@@ -81,16 +107,15 @@ public class Requests {
             }
             
             let (data, response) = try await URLSession.shared.data(for: request)
-            if let response = response as? HTTPURLResponse, response.statusCode != 200 && !ignoredFailureStatusCodes.contains(response.statusCode) {
-                debug("\(url.absoluteString) 返回了 \(response.statusCode): \(String(data: data, encoding: .utf8) ?? "(empty)")")
+            guard let response = response as? HTTPURLResponse else {
+                throw MyLocalizedError(reason: "响应格式不正确。")
             }
-            let json = try? JSON(data: data)
-            return Response(data: data, json: json, error: nil)
+            return .success(response: response, data: data)
         } catch let error as URLError where error.code == .cancelled {
-            return Response(data: nil, json: nil, error: nil)
+            return .failure(error: error)
         } catch {
             err("在发送请求时发生错误: \(error)")
-            return Response(data: nil, json: nil, error: error)
+            return .failure(error: error)
         }
     }
 
@@ -98,19 +123,17 @@ public class Requests {
         _ url: URLConvertible,
         headers: [String: String]? = nil,
         body: [String: Any]? = nil,
-        encodeMethod: EncodeMethod = .urlEncoded,
-        ignoredFailureStatusCodes: [Int] = []
+        encodeMethod: EncodeMethod = .urlEncoded
     ) async -> Response {
-        return await request(url: url.url, method: "GET", headers: headers, body: body, encodeMethod: encodeMethod, ignoredFailureStatusCodes: ignoredFailureStatusCodes)
+        return await request(url: url.url, method: "GET", headers: headers, body: body, encodeMethod: encodeMethod)
     }
 
     public static func post(
         _ url: URLConvertible,
         headers: [String: String]? = nil,
         body: [String: Any]? = nil,
-        encodeMethod: EncodeMethod = .json,
-        ignoredFailureStatusCodes: [Int] = []
+        encodeMethod: EncodeMethod = .json
     ) async -> Response {
-        return await request(url: url.url, method: "POST", headers: headers, body: body, encodeMethod: encodeMethod, ignoredFailureStatusCodes: ignoredFailureStatusCodes)
+        return await request(url: url.url, method: "POST", headers: headers, body: body, encodeMethod: encodeMethod)
     }
 }
