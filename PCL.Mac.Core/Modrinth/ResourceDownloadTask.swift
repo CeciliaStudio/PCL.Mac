@@ -33,6 +33,11 @@ public class ResourceDownloadTask: InstallTask {
         }
         
         try await downloader.start()
+        for version in versions {
+            if version.projectType == .mod {
+                instance.config.mods[version.downloadURL.lastPathComponent] = version.projectId
+            }
+        }
     }
     
     private func getDestinationDirectory(_ version: ProjectVersion) -> URL! {

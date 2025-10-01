@@ -52,7 +52,7 @@ public class MinecraftInstance: Identifiable, Equatable, Hashable {
     ) -> MinecraftInstance? {
         return create(
             directory: directory,
-            runningDirectory: directory.versionsURL.appending(path: "name"),
+            runningDirectory: directory.versionsURL.appending(path: name),
             config: config,
             doCache: doCache
         )
@@ -313,12 +313,20 @@ public class MinecraftInstance: Identifiable, Equatable, Hashable {
 }
 
 public class MinecraftConfig: Codable {
+    /// 实例使用的 Java 的路径
     public var javaURL: URL!
+    /// 是否跳过资源完整性检查
     public var skipResourcesCheck: Bool = false
+    /// 最大内存分配（MB）
     public var maxMemory: Int32 = 4096
+    /// 实例进程 QoS
     public var qualityOfService: QualityOfService = .default
+    /// 实例版本（缓存）
     public var minecraftVersion: String!
+    /// 上次启动时间
     public var lastLaunch: Date?
+    /// 模组列表，键为模组文件名，值为对应的 Modrinth Project `slug`
+    public var mods: [String: String] = [:]
     
     public init() {}
 }
