@@ -13,7 +13,8 @@ public struct SharedConstants {
     public let applicationContentsURL: URL
     public let applicationResourcesURL: URL
     public let logURL: URL
-    public let applicationSupportURL: URL = .applicationSupportDirectory.appending(path: "PCL-Mac")
+    public let applicationSupportURL: URL = .applicationSupportDirectory.appending(path: "PCL.Mac")
+    public let configURL: URL
     public let temperatureURL: URL
     public let authlibInjectorURL: URL
     
@@ -25,6 +26,7 @@ public struct SharedConstants {
         self.applicationContentsURL = Bundle.main.bundleURL.appending(path: "Contents")
         self.applicationResourcesURL = self.applicationContentsURL.appending(path: "Resources")
         self.logURL = applicationSupportURL.appending(path: "Logs").appending(path: "app.log")
+        self.configURL = applicationSupportURL.appending(path: "Config")
         self.temperatureURL = applicationSupportURL.appending(path: "Temp")
         self.authlibInjectorURL = applicationSupportURL.appending(path: "authlib-injector.jar")
         

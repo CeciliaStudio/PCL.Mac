@@ -14,4 +14,11 @@ public extension Optional {
         }
         return value
     }
+    
+    func forceUnwrap(_ errorMessage: String? = nil, file: String = #file, line: Int = #line) -> Wrapped {
+        guard let value = self else {
+            fatalError(errorMessage ?? "\(file.split(separator: "/").last!):\(line) 强制解包失败")
+        }
+        return value
+    }
 }

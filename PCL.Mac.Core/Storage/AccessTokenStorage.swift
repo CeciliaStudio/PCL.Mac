@@ -26,7 +26,7 @@ struct AccessTokenInfo: Codable, Identifiable {
 final class AccessTokenStorage: ObservableObject {
     static let shared = AccessTokenStorage()
 
-    @CodableAppStorage("accessTokens") private var accessTokens: [UUID: AccessTokenInfo] = [:]
+    @StoredProperty(.account, "accessTokens") private var accessTokens: [UUID: AccessTokenInfo] = [:]
 
     private init() {
         removeExpiredTokens()
