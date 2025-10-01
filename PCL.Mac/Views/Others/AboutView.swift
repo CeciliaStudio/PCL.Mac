@@ -59,9 +59,17 @@ struct AboutView: View {
                     ProfileCard(
                         imageName: "YiZhiMCQiu",
                         name: "YiZhiMCQiu | Minecraft-温迪",
-                        description: "PCL.Mac 的作者",
+                        description: "PCL.Mac 的主要开发者",
                         buttonName: "进入主页",
                         buttonURL: "https://github.com/YiZhiMCQiu"
+                    )
+                    
+                    ProfileCard(
+                        imageName: "CeciliaStudio",
+                        name: "Cecilia Studio",
+                        description: "PCL.Mac 开发团队",
+                        buttonName: "进入主页",
+                        buttonURL: "https://github.com/CeciliaStudio"
                     )
                     
                     ProfileCard(
