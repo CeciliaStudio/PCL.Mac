@@ -2,6 +2,8 @@ name: "新功能建议"
 description: "为这个项目提出一个主意"
 labels: "等待处理"
 
+title: "[Feature] "
+
 body:
 - type: textarea
   id: feature

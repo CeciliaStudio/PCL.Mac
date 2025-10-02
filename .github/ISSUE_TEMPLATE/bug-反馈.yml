@@ -2,6 +2,8 @@ name: "Bug 反馈"
 description: "报告启动器中的错误，帮助我们改进。"
 labels: "等待确认"
 
+title: "[Bug] "
+
 body:
 - type: checkboxes
   id: checklist

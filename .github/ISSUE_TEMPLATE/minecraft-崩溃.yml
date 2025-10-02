@@ -2,6 +2,8 @@ name: "Minecraft 崩溃"
 description: "Minecraft 客户端意外退出"
 labels: "等待确认"
 
+title: "[Crash] "
+
 body:
 - type: checkboxes
   id: checklist

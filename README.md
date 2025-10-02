@@ -1,7 +1,7 @@
 # PCL.Mac 🖥️
 
 <div align="center">
-  <img alt="Logo" src="/.github/assets/icon.png" width="180">
+  <img alt="Logo" src="/PCL.Mac/Assets.xcassets/AppIcon.appiconset/AppIcon.png" width="180">
 
   [![Minimum OS Version](https://img.shields.io/badge/macOS-13.0+-81AD18)](https://developer.apple.com/macos/)
   [![Stars](https://img.shields.io/github/stars/CeciliaStudio/PCL.Mac?style=flat)](https://github.com/CeciliaStudio/PCL.Mac/stargazers)

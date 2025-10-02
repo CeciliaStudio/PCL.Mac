@@ -1,0 +1,14 @@
+name: "添加任务"
+description: "该模板仅供开发人员使用。"
+labels: "等待处理"
+
+title: "[Task] "
+
+body:
+- type: textarea
+  id: feature
+  attributes:
+    label: 任务描述
+    placeholder: "请写明你希望实现的具体功能、优化点或需要解决的问题。"
+  validations:
+    required: true
