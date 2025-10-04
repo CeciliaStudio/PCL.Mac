@@ -148,11 +148,14 @@ fileprivate struct LeftTab: View {
                     dataManager.launchState = launchState
                     
                     Task {
-                        guard await launchPrecheck(launchOptions) else { return }
+                        guard await launchPrecheck(launchOptions) else {
+                            dataManager.launchState = nil
+                            return
+                        }
                         debug("正在启动游戏")
                         await instance.launch(launchOptions, launchState)
                         await MainActor.run {
-                            self.dataManager.launchState = nil
+                            dataManager.launchState = nil
                         }
                     }
                 }
@@ -202,7 +205,7 @@ fileprivate struct LeftTab: View {
         .onAppear {
             if let directory = AppSettings.shared.currentMinecraftDirectory,
                let defaultInstance = AppSettings.shared.defaultInstance,
-               let instance = MinecraftInstance.create(directory.versionsURL.appending(path: defaultInstance)) {
+               let instance = MinecraftInstance.create(directory: directory, name: defaultInstance) {
                 self.instance = instance
             }
         }

@@ -40,16 +40,18 @@ public enum DownloadSourceOption: Codable {
 public class AppSettings: ObservableObject {
     public static let shared = AppSettings()
     
+    // MARK: - App 设置
+    
     /// 是否显示 PCL.Mac 弹窗
-    @AppStorage("showPclMacPopup") public var showPclMacPopup: Bool = true
+    @StoredProperty(.appSettings, "showPCLMacPopup") public var showPCLMacPopup: Bool = true
     
     /// 用户添加的 Java 路径
-    @CodableAppStorage("userAddedJvmPaths") public var userAddedJvmPaths: [URL] = []
+    @StoredProperty(.appSettings, "userAddedJvmPaths") public var userAddedJvmPaths: [URL] = []
     
     @Published public var theme: Theme!
     
     /// 主题 ID (文件名)
-    @CodableAppStorage("themeId") public var themeId: String = "pcl" {
+    @StoredProperty(.appSettings, "themeId") public var themeId: String = "pcl" {
         didSet {
             if themeId != self.theme.id {
                 self.theme = .load(id: themeId)
@@ -58,50 +60,63 @@ public class AppSettings: ObservableObject {
         }
     }
     
-    /// 启动时若为空自动设置为第一个实例
-    @AppStorage("defaultInstance") public var defaultInstance: String?
-    
     /// 配色方案
-    @CodableAppStorage("colorScheme") public var colorScheme: ColorSchemeOption = .light
-    
-    /// 最后一次获取到的 VersionManifest，断网时使用
-    @CodableAppStorage("lastVersionManifest") public var lastVersionManifest: VersionManifest? = nil
-    
-    /// 当前 MinecraftDirectory
-    @CodableAppStorage("currentMinecraftDirectory") public var currentMinecraftDirectory: MinecraftDirectory! = .default
-    
-    /// 所有 MinecraftDirectory
-    @CodableAppStorage("minecraftDirectories") public var minecraftDirectories: [MinecraftDirectory] = [.default]
+    @StoredProperty(.appSettings, "colorScheme") public var colorScheme: ColorSchemeOption = .light {
+        didSet {
+            DataManager.shared.objectWillChange.send()
+        }
+    }
     
     /// 窗口按钮样式
-    @CodableAppStorage("windowControlButtonStyle") public var windowControlButtonStyle: WindowControlButtonStyle = .pcl
-    
-    /// 是否登录过一次微软账号
-    @AppStorage("hasMicrosoftAccount") public var hasMicrosoftAccount: Bool = false
-    
-    /// 累计启动次数
-    @AppStorage("launchCount") public var launchCount: Int = 0
-    
-    /// 启动器是否全屏
-    @AppStorage("fullScreen") public var fullScreen: Bool = false
+    @StoredProperty(.appSettings, "windowControlButtonStyle") public var windowControlButtonStyle: WindowControlButtonStyle = .pcl {
+        didSet {
+            DataManager.shared.objectWillChange.send()
+        }
+    }
     
     /// 下载自定义文件时的保存 URL
-    @AppStorage("customFilesSaveURL") public var customFilesSaveURL: URL = URL(fileURLWithUserPath: "~/Downloads")
+    @StoredProperty(.appSettings, "customFilesSaveURL") public var customFilesSaveURL: URL = URL(fileURLWithUserPath: "~/Downloads")
     
     /// 使用过的主题解锁码
-    @CodableAppStorage("usedThemeCodes") public var usedThemeCodes: [String] = []
+    @StoredProperty(.appSettings, "usedThemeCodes") public var usedThemeCodes: [String] = []
     
     /// 是否启用超薄材质
-    @CodableAppStorage("useUltraThinMaterial") public var useUltraThinMaterial: Bool = false
-    
-    /// 文件下载源
-    @CodableAppStorage("fileDownloadSource") public var fileDownloadSource: DownloadSourceOption = .both
-    
-    /// 版本列表源
-    @CodableAppStorage("versionManifestSource") public var versionManifestSource: DownloadSourceOption = .both
+    @StoredProperty(.appSettings, "useUltraThinMaterial") public var useUltraThinMaterial: Bool = false {
+        didSet {
+            DataManager.shared.objectWillChange.send()
+        }
+    }
     
     /// 用于更新检查的启动器版本 id，更新或跳过更新后更改
-    @CodableAppStorage("launcherVersionId") public var launcherVersionId: Int = -1
+    @StoredProperty(.appSettings, "launcherVersionId") public var launcherVersionId: Int = -1
+    
+    // MARK: - Minecraft 相关
+    
+    /// 启动时若为空自动设置为第一个实例
+    @StoredProperty(.minecraft, "defaultInstance") public var defaultInstance: String? = nil
+    
+    /// 最后一次获取到的 VersionManifest，断网时使用
+    @StoredProperty(.minecraft, "lastVersionManifest") public var lastVersionManifest: VersionManifest? = nil
+    
+    /// 当前 MinecraftDirectory
+    @StoredProperty(.minecraft, "currentMinecraftDirectory") public var currentMinecraftDirectory: MinecraftDirectory! = .default
+    
+    /// 所有 MinecraftDirectory
+    @StoredProperty(.minecraft, "minecraftDirectories") public var minecraftDirectories: [MinecraftDirectory] = [.default]
+    
+    /// 累计启动次数
+    @StoredProperty(.minecraft, "launchCount") public var launchCount: Int = 0
+    
+    /// 文件下载源
+    @StoredProperty(.minecraft, "fileDownloadSource") public var fileDownloadSource: DownloadSourceOption = .both
+    
+    /// 版本列表源
+    @StoredProperty(.minecraft, "versionManifestSource") public var versionManifestSource: DownloadSourceOption = .both
+    
+    // MARK: - 账号相关
+    
+    /// 是否登录过一次微软账号
+    @StoredProperty(.account, "hasMicrosoftAccount") public var hasMicrosoftAccount: Bool = false
     
     public func updateColorScheme() {
         if colorScheme != .system {

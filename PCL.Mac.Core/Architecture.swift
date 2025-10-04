@@ -72,10 +72,10 @@ public enum Architecture {
     /// ARM64，Apple Silicon
     case arm64
     
-    /// x86_64，Intel Chip
+    /// x86\_64，Intel Chip
     case x64
     
-    /// Universal Binary，至少包含 ARM64 与 x86_64
+    /// Universal Binary，至少包含 arm64 与 x64
     case fatFile
     
     /// 未知

@@ -116,8 +116,8 @@ struct DownloadPage: View {
                         if let loader {
                             let task: InstallTask? =
                             switch loader.loader {
-                            case .fabric: FabricInstallTask(instanceURL: instanceURL, loaderVersion: loader.version)
-                            case .forge, .neoforge: ForgeInstallTask(instanceURL: instanceURL, loaderVersion: loader.version, isNeoforge: loader.loader == .neoforge)
+                            case .fabric: FabricInstallTask(directory: directory, instanceURL: instanceURL, loaderVersion: loader.version)
+                            case .forge, .neoforge: ForgeInstallTask(directory: directory, instanceURL: instanceURL, loaderVersion: loader.version, isNeoforge: loader.loader == .neoforge)
                             default: nil
                             }
                             tasks.addTask(key: loader.loader.rawValue, task: task!)

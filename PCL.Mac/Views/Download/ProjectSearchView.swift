@@ -387,12 +387,12 @@ struct ProjectQueueOverlay: View {
                                     PopupManager.shared.show(.init(.error, "资源下载失败", "\(failure.localizedDescription)\n若要寻求帮助，请进入设置 > 其它 > 打开日志，将选中的文件发给别人，而不是发送此页面的照片或截图。", [.ok]))
                                 }
                             }
-                            state.pendingDownloadProjects.removeAll()
                             if let id = state.projectQueueOverlayId {
                                 OverlayManager.shared.removeOverlay(with: id)
                                 state.projectQueueOverlayId = nil
                             }
                             hint("开始下载 \(state.pendingDownloadProjects.count) 个资源……")
+                            state.pendingDownloadProjects.removeAll()
                         }
                         .fixedSize()
                     }

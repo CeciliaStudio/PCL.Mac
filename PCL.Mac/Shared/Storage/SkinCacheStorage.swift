@@ -10,7 +10,7 @@ import Foundation
 class SkinCacheStorage {
     public static let shared: SkinCacheStorage = .init()
     
-    @CodableAppStorage("skinCache") var skinCache: [UUID : Data] = [:]
+    @StoredProperty(.account, "skinCache") var skinCache: [UUID : Data] = [:]
     
     @discardableResult
     public func loadSkin(account: AnyAccount) async throws -> Data {
