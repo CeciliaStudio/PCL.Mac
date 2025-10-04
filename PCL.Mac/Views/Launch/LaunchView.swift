@@ -148,11 +148,14 @@ fileprivate struct LeftTab: View {
                     dataManager.launchState = launchState
                     
                     Task {
-                        guard await launchPrecheck(launchOptions) else { return }
+                        guard await launchPrecheck(launchOptions) else {
+                            dataManager.launchState = nil
+                            return
+                        }
                         debug("正在启动游戏")
                         await instance.launch(launchOptions, launchState)
                         await MainActor.run {
-                            self.dataManager.launchState = nil
+                            dataManager.launchState = nil
                         }
                     }
                 }
