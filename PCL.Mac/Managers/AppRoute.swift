@@ -74,7 +74,7 @@ public enum AppRoute: Hashable {
         case .projectDownload(let summary): "资源下载 - \(summary.name)"
         case .accountManagement, .accountList, .newAccount: "账号管理"
         case .announcementHistory: "历史公告"
-        case .instanceSettings, .instanceOverview, .instanceConfig, .instanceMods: "实例设置 - \(AppSettings.shared.defaultInstance ?? "")"
+        case .instanceSettings, .instanceOverview, .instanceConfig, .instanceMods: "实例设置 - \(MinecraftDirectoryManager.shared.current.config.defaultInstance ?? "")"
         case .javaDownload: "Java 下载"
         case .themeUnlock: "主题解锁"
         default: "发现问题请在 https://github.com/CeciliaStudio/PCL.Mac/issues/new 上反馈！"

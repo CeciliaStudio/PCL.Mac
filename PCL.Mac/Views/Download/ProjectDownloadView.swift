@@ -84,7 +84,7 @@ fileprivate struct ProjectVersionListView: View {
     
     private func installModpack(url: URL) {
         do {
-            let importer: ModrinthModpackImporter = try .init(minecraftDirectory: AppSettings.shared.currentMinecraftDirectory, modpackURL: url)
+            let importer: ModrinthModpackImporter = try .init(minecraftDirectory: MinecraftDirectoryManager.shared.current, modpackURL: url)
             let index: ModrinthModpackIndex = try importer.loadIndex()
             let tasks: InstallTasks = try importer.createInstallTasks()
             dataManager.inprogressInstallTasks = tasks

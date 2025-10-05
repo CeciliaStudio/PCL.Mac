@@ -92,17 +92,11 @@ public class AppSettings: ObservableObject {
     
     // MARK: - Minecraft 相关
     
-    /// 启动时若为空自动设置为第一个实例
-    @StoredProperty(.minecraft, "defaultInstance") public var defaultInstance: String? = nil
-    
     /// 最后一次获取到的 VersionManifest，断网时使用
     @StoredProperty(.minecraft, "lastVersionManifest") public var lastVersionManifest: VersionManifest? = nil
     
-    /// 当前 MinecraftDirectory
-    @StoredProperty(.minecraft, "currentMinecraftDirectory") public var currentMinecraftDirectory: MinecraftDirectory! = .default
-    
-    /// 所有 MinecraftDirectory
-    @StoredProperty(.minecraft, "minecraftDirectories") public var minecraftDirectories: [MinecraftDirectory] = [.default]
+    /// 所有 MinecraftDirectory 的 URL
+    @StoredProperty(.minecraft, "minecraftDirectoryURLs") public var minecraftDirectoryURLs: [URL] = [URL(fileURLWithUserPath: "~/Library/Application Support/minecraft")]
     
     /// 累计启动次数
     @StoredProperty(.minecraft, "launchCount") public var launchCount: Int = 0
@@ -131,41 +125,6 @@ public class AppSettings: ObservableObject {
     
     private init() {
         updateColorScheme()
-        
-        if currentMinecraftDirectory == nil {
-            currentMinecraftDirectory = .default
-        }
-        
-        if let directory = currentMinecraftDirectory {
-            if !minecraftDirectories.contains(where: { $0.rootURL == directory.rootURL }) {
-                minecraftDirectories.append(directory)
-            }
-            
-            if defaultInstance == nil {
-                directory.loadInnerInstances { instances in
-                    if case .success(let instances) = instances {
-                        self.defaultInstance = instances.first?.name
-                    }
-                }
-            }
-        }
         log("已加载启动器设置")
-    }
-    
-    public func removeDirectory(url: URL) {
-        if currentMinecraftDirectory?.rootURL == url || currentMinecraftDirectory == nil {
-            currentMinecraftDirectory = .default
-            if case .versionList = DataManager.shared.router.getLast() {
-                DataManager.shared.router.removeLast()
-                DataManager.shared.router.append(.versionList(directory: .default))
-            }
-        }
-        minecraftDirectories.removeAll(where: { $0.rootURL == url })
-        
-        if minecraftDirectories.isEmpty {
-            minecraftDirectories.append(currentMinecraftDirectory)
-        }
-        
-        DataManager.shared.objectWillChange.send()
     }
 }

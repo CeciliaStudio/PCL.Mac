@@ -179,6 +179,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        MinecraftDirectoryManager.shared.save()
         PropertyStorage.saveAll()
         log("PropertyStorage 保存完成")
         try? FileManager.default.removeItem(at: Self.exitFlagURL)

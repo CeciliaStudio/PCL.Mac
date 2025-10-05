@@ -174,7 +174,7 @@ fileprivate struct LeftTab: View {
                 MyButton(text: "实例选择") {
                     dataManager.router.append(.versionSelect)
                 }
-                if AppSettings.shared.defaultInstance != nil {
+                if MinecraftDirectoryManager.shared.getDefaultInstance() != nil {
                     MyButton(text: "实例设置") {
                         if let instance = self.instance {
                             dataManager.router.append(.instanceSettings(instance: instance))
@@ -203,9 +203,7 @@ fileprivate struct LeftTab: View {
         .frame(width: 300)
         .foregroundStyle(Color(hex: 0x343D4A))
         .onAppear {
-            if let directory = AppSettings.shared.currentMinecraftDirectory,
-               let defaultInstance = AppSettings.shared.defaultInstance,
-               let instance = MinecraftInstance.create(directory: directory, name: defaultInstance) {
+            if let instance = dataManager.defaultInstance {
                 self.instance = instance
             }
         }

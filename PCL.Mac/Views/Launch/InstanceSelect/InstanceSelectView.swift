@@ -24,7 +24,7 @@ struct InstanceSelectView: View, SubRouteContainer {
             dataManager.leftTab(300) {
                 LeftTab()
             }
-            dataManager.router.append(.versionList(directory: AppSettings.shared.currentMinecraftDirectory))
+            dataManager.router.append(.versionList(directory: MinecraftDirectoryManager.shared.current))
         }
     }
 }
@@ -32,6 +32,7 @@ struct InstanceSelectView: View, SubRouteContainer {
 fileprivate struct LeftTab: View {
     @ObservedObject private var dataManager: DataManager = .shared
     @ObservedObject private var settings: AppSettings = .shared
+    @ObservedObject private var directoryManager: MinecraftDirectoryManager = .shared
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -42,7 +43,7 @@ fileprivate struct LeftTab: View {
                 .padding(.top, 20)
                 .padding(.bottom, 4)
             MyList(
-                cases: settings.minecraftDirectories.map(AppRoute.versionList(directory:)),
+                cases: MinecraftDirectoryManager.shared.directories.map(AppRoute.versionList(directory:)),
                 height: 42,
             ) { route, isSelected in
                 if case .versionList(let directory) = route {
@@ -67,13 +68,13 @@ fileprivate struct LeftTab: View {
                     panel.allowedContentTypes = [.folder]
                     
                     if panel.runModal() == .OK {
-                        guard !settings.minecraftDirectories.contains(where: { $0.rootURL == panel.url! }) else {
+                        guard !MinecraftDirectoryManager.shared.directories.contains(where: { $0.rootURL == panel.url! }) else {
                             hint("该目录已存在！", .critical)
                             return
                         }
                         let directory = MinecraftDirectory(rootURL: panel.url!, config: .init(name: "自定义目录"))
-                        settings.minecraftDirectories.append(directory)
-                        settings.currentMinecraftDirectory = directory
+                        MinecraftDirectoryManager.shared.directories.append(directory)
+                        MinecraftDirectoryManager.shared.current = directory
                         hint("添加成功", .finish)
                     }
                 }
@@ -104,7 +105,7 @@ fileprivate struct LeftTab: View {
         }
         
         do {
-            let importer = try ModrinthModpackImporter(minecraftDirectory: settings.currentMinecraftDirectory, modpackURL: url)
+            let importer = try ModrinthModpackImporter(minecraftDirectory: MinecraftDirectoryManager.shared.current, modpackURL: url)
             let index = try importer.loadIndex()
             let tasks = try importer.createInstallTasks()
             dataManager.inprogressInstallTasks = tasks
@@ -154,7 +155,7 @@ fileprivate struct LeftTab: View {
                         .contentShape(Rectangle())
                         .onTapGesture {
                             // 移除 Minecraft 目录
-                            settings.removeDirectory(url: directory.rootURL)
+                            MinecraftDirectoryManager.shared.remove(directory)
                             hint("移除成功", .finish)
                         }
                         .padding(4)

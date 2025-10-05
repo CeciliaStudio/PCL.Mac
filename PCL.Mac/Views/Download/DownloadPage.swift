@@ -109,7 +109,7 @@ struct DownloadPage: View {
                         }
                         
                         if DataManager.shared.inprogressInstallTasks != nil { return }
-                        let directory = AppSettings.shared.currentMinecraftDirectory!
+                        let directory: MinecraftDirectory = MinecraftDirectoryManager.shared.current
                         let instanceURL = directory.versionsURL.appending(path: name)
                         
                         // 如果选择了加载器，添加加载器安装任务
@@ -135,7 +135,7 @@ struct DownloadPage: View {
                             switch result {
                             case .success(_):
                                 hint("\(name) 安装完成！", .finish)
-                                AppSettings.shared.defaultInstance = name
+                                MinecraftDirectoryManager.shared.setDefaultInstance(name)
                             case .failure(let failure):
                                 PopupManager.shared.show(.init(.error, "Minecraft 安装失败", "\(failure.localizedDescription)\n若要寻求帮助，请进入设置 > 其它 > 打开日志，将选中的文件发给别人，而不是发送此页面的照片或截图。", [.ok]))
                             }
@@ -154,8 +154,7 @@ struct DownloadPage: View {
             errorMessage = "带 Mod 加载器的实例名不能与版本号一致！"
         } else if name.isEmpty {
             errorMessage = "实例名不能为空！"
-        } else if let directory = AppSettings.shared.currentMinecraftDirectory,
-                  FileManager.default.fileExists(atPath: directory.versionsURL.appending(path: name).path) {
+        } else if FileManager.default.fileExists(atPath: MinecraftDirectoryManager.shared.current.versionsURL.appending(path: name).path) {
             errorMessage = "已有同名实例！"
         } else {
             errorMessage = ""

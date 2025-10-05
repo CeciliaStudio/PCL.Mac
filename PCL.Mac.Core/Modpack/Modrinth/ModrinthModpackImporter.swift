@@ -80,7 +80,12 @@ public class ModrinthModpackImporter {
                 ))
             }
             
-            let modpackInstallTask = ModpackInstallTask(instanceURL: instanceURL, index: index, temp: temp)
+            let modpackInstallTask = ModpackInstallTask(
+                directory: minecraftDirectory,
+                instanceURL: instanceURL,
+                index: index,
+                temp: temp
+            )
             installTasks.addTask(key: "modpack", task: modpackInstallTask)
             
             return installTasks
@@ -110,11 +115,18 @@ public class ModrinthModpackImporter {
 }
 
 private class ModpackInstallTask: InstallTask {
+    private let directory: MinecraftDirectory
     private let instanceURL: URL
     private let index: ModrinthModpackIndex
     private let temp: TemperatureDirectory
     
-    fileprivate init(instanceURL: URL, index: ModrinthModpackIndex, temp: TemperatureDirectory) {
+    fileprivate init(
+        directory: MinecraftDirectory,
+        instanceURL: URL,
+        index: ModrinthModpackIndex,
+        temp: TemperatureDirectory
+    ) {
+        self.directory = directory
         self.instanceURL = instanceURL
         self.index = index
         self.temp = temp
@@ -146,7 +158,7 @@ private class ModpackInstallTask: InstallTask {
             increaseProgress(step)
         }
         await MainActor.run {
-            AppSettings.shared.defaultInstance = instanceURL.lastPathComponent
+            self.directory.config.defaultInstance = instanceURL.lastPathComponent
         }
     }
     
