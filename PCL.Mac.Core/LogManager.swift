@@ -24,12 +24,15 @@ final class LogStore {
     var logLines: [LogLine] = []
     private let maxCapacity = 10_000
     private let writeImmediately = true
+    private let fileHandle: FileHandle
     
     private let queue = DispatchQueue(label: "io.github.pcl-community.LogStoreQueue")
 
     private init() {
         dateFormatter.dateFormat = "[yyyy-MM-dd] [HH:mm:ss.SSS]"
         dateFormatter.timeZone = TimeZone(identifier: "Asia/Shanghai")
+        self.fileHandle = try! FileHandle(forWritingTo: SharedConstants.shared.logURL)
+        try? self.fileHandle.truncate(atOffset: 0)
     }
     
     func append(_ message: String, _ level: String, _ caller: String) {
@@ -60,7 +63,7 @@ final class LogStore {
     
     func appendToDisk(_ content: String, _ callback: ((Bool) -> Void)? = nil) {
         do {
-            try FileManager.writeLog(content)
+            try fileHandle.write(contentsOf: content.data(using: .utf8)!)
             callback?(true)
         } catch {
             err("日志保存失败: \(error.localizedDescription)")
