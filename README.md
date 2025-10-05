@@ -1,6 +1,5 @@
-# PCL.Mac 🖥️
-
 <div align="center">
+  <h1>PCL.Mac</h1>
   <img alt="Logo" src="/PCL.Mac/Assets.xcassets/AppIcon.appiconset/AppIcon.png" width="180">
 
   [![Minimum OS Version](https://img.shields.io/badge/macOS-13.0+-81AD18)](https://developer.apple.com/macos/)
