@@ -51,9 +51,7 @@ struct InstanceListView: View {
             if directory.instances.isEmpty {
                 Task {
                     do {
-                        debug(1)
                         try await directory.loadInstances()
-                        debug(2)
                     } catch {
                         self.error = error
                     }

@@ -146,6 +146,17 @@ fileprivate struct LeftTab: View {
                 }
                 Spacer()
                 if isHovered {
+                    Image("SettingsIcon")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 16)
+                        .bold()
+                        .foregroundStyle(AppSettings.shared.theme.getTextStyle())
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            DataManager.shared.router.removeLast()
+                            DataManager.shared.router.append(.directoryConfig(directory: directory))
+                        }
                     Image(systemName: "xmark")
                         .resizable()
                         .scaledToFit()

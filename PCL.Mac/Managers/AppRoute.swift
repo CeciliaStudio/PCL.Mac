@@ -24,6 +24,7 @@ public enum AppRoute: Hashable {
     case projectDownload(summary: ProjectSummary)
     case announcementHistory
     case instanceSettings(instance: MinecraftInstance)
+    case directoryConfig(directory: MinecraftDirectory)
     
     // MyList 导航
     case minecraftDownload
@@ -77,6 +78,7 @@ public enum AppRoute: Hashable {
         case .instanceSettings, .instanceOverview, .instanceConfig, .instanceMods: "实例设置 - \(MinecraftDirectoryManager.shared.current.config.defaultInstance ?? "")"
         case .javaDownload: "Java 下载"
         case .themeUnlock: "主题解锁"
+        case .directoryConfig(let directory): "目录配置 - \(directory.config.name)"
         default: "发现问题请在 https://github.com/CeciliaStudio/PCL.Mac/issues/new 上反馈！"
         }
     }
@@ -126,6 +128,8 @@ public class AppRouter: ObservableObject {
             JavaInstallView()
         case .themeUnlock:
             ThemeUnlockView()
+        case .directoryConfig(let directory):
+            DirectoryConfigView(directory: directory)
         }
     }
     

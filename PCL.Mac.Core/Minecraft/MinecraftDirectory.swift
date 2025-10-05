@@ -9,6 +9,7 @@ import Foundation
 
 public class MinecraftDirectory: ObservableObject, Hashable, Equatable {
     public static let `default`: MinecraftDirectory = .init(rootURL: .applicationSupportDirectory.appending(path: "minecraft"), config: Config(name: "默认文件夹"))
+    private static let sharedResourcesURL: URL = URL(fileURLWithUserPath: "~/Library/Application Support/minecraft/shared/")
     
     @Published public var instances: [InstanceInfo] = []
     public let rootURL: URL
@@ -42,6 +43,24 @@ public class MinecraftDirectory: ObservableObject, Hashable, Equatable {
         saveConfig()
     }
     
+    public func enableSymbolicLink() throws {
+        try FileManager.default.removeItem(at: librariesURL)
+        try FileManager.default.createDirectory(at: Self.sharedResourcesURL.appending(path: "libraries"), withIntermediateDirectories: true)
+        try FileManager.default.createSymbolicLink(at: librariesURL, withDestinationURL: Self.sharedResourcesURL.appending(path: "libraries"))
+        
+        try FileManager.default.removeItem(at: assetsURL)
+        try FileManager.default.createDirectory(at: Self.sharedResourcesURL.appending(path: "assets"), withIntermediateDirectories: true)
+        try FileManager.default.createSymbolicLink(at: assetsURL, withDestinationURL: Self.sharedResourcesURL.appending(path: "assets"))
+    }
+    
+    public func disableSymbolicLink() throws {
+        try FileManager.default.removeItem(at: librariesURL)
+        try FileManager.default.copyItem(at: Self.sharedResourcesURL.appending(path: "libraries"), to: librariesURL)
+        
+        try FileManager.default.removeItem(at: assetsURL)
+        try FileManager.default.copyItem(at: Self.sharedResourcesURL.appending(path: "assets"), to: assetsURL)
+    }
+    
     public func hash(into hasher: inout Hasher) {
         hasher.combine(rootURL)
     }
@@ -65,7 +84,9 @@ public class MinecraftDirectory: ObservableObject, Hashable, Equatable {
         do {
             let encoder: JSONEncoder = JSONEncoder()
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
-            try FileHandle(forWritingTo: rootURL.appending(path: ".config.json")).write(encoder.encode(config))
+            let handle: FileHandle = try FileHandle(forWritingTo: rootURL.appending(path: ".config.json"))
+            try handle.truncate(atOffset: 0)
+            try handle.write(encoder.encode(config))
         } catch {
             err("无法保存配置: \(error.localizedDescription)")
         }
@@ -76,7 +97,6 @@ public class MinecraftDirectory: ObservableObject, Hashable, Equatable {
     @discardableResult
     public func loadInstances() async throws -> [InstanceInfo] {
         // 避免异步操作导致的数据不同步
-        var instances: [InstanceInfo] = []
         let contents = try FileManager.default.contentsOfDirectory(at: versionsURL, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles])
         let instanceURLs = contents.filter { url in
             (try? url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true
@@ -90,17 +110,19 @@ public class MinecraftDirectory: ObservableObject, Hashable, Equatable {
                     version: instance.version,
                     brand: instance.clientBrand
                 )
-                instances.append(info)
+                await MainActor.run {
+                    self.instances.append(info)
+                }
             }
         }
-        instances.sort { instance1, instance2 in
-            if instance1.brand == instance2.brand {
-                return instance1.version > instance2.version
+        await MainActor.run {
+            self.instances.sort { instance1, instance2 in
+                if instance1.brand == instance2.brand {
+                    return instance1.version > instance2.version
+                }
+                return instance1.brand.index < instance2.brand.index
             }
-            return instance1.brand.index < instance2.brand.index
         }
-        self.instances.removeAll()
-        self.instances = instances
         return instances
     }
     
