@@ -55,10 +55,11 @@ public class MinecraftLauncher {
             
             let logHandle = try FileHandle(forWritingTo: logURL)
             pipe.fileHandleForReading.readabilityHandler = { handle in
-                for line in String(data: handle.availableData, encoding: .utf8)!.split(separator: "\n") {
-                    raw(line.replacing("\t", with: "    "))
+                guard let content = String(data: handle.availableData, encoding: .utf8) else {
+                    return
+                }
+                for line in content.split(separator: "\n") {
                     try? logHandle.write(contentsOf: (line + "\n").data(using: .utf8)!)
-                    logHandle.seekToEndOfFile()
                 }
             }
             try process.run()

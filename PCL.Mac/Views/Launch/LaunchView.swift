@@ -286,7 +286,7 @@ struct LaunchView: View {
             }
             
             if SharedConstants.shared.isDevelopment {
-                StaticMyCard(index: 0, title: "警告") {
+                StaticMyCard(index: 1, title: "警告") {
                     VStack(spacing: 4) {
                         Text("你正在使用开发版本的 PCL.Mac！")
                             .font(.custom("PCL English", size: 14))
@@ -304,28 +304,6 @@ struct LaunchView: View {
                     .foregroundStyle(Color("TextColor"))
                 }
                 .padding()
-                
-                StaticMyCard(index: 1, title: "日志") {
-                    VStack {
-                        ScrollView(.horizontal) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                ForEach(LogStore.shared.logLines) { logLine in
-                                    logLineView(logLine.string)
-                                        .foregroundStyle(Color("TextColor"))
-                                }
-                            }
-                        }
-                        .scrollIndicators(.never)
-                        .padding(.top, 5)
-                        
-                        MyButton(text: "打开日志") {
-                            NSWorkspace.shared.activateFileViewerSelecting([SharedConstants.shared.logURL])
-                        }
-                        .frame(height: 40)
-                    }
-                }
-                .padding()
-                .padding(.bottom, 20)
             }
             Spacer()
         }

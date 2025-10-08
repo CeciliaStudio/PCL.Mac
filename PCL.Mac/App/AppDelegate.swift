@@ -103,7 +103,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             try? FileManager.default.createDirectory(at: SharedConstants.shared.temperatureURL, withIntermediateDirectories: true)
         }
         FileManager.default.createFile(atPath: Self.exitFlagURL.path, contents: nil)
-        LogStore.shared.clear()
         let start = Date().timeIntervalSince1970
         log("App 已启动")
         PropertyStorage.loadAll()
@@ -183,7 +182,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         PropertyStorage.saveAll()
         log("PropertyStorage 保存完成")
         try? FileManager.default.removeItem(at: Self.exitFlagURL)
-        LogStore.shared.save()
         return .terminateNow
     }
     
