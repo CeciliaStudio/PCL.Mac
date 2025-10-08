@@ -248,6 +248,7 @@ fileprivate struct LeftTab: View {
             switch error {
             case .missingAccount:
                 PopupManager.shared.show(.init(.error, "错误", "请先创建一个账号并选择再启动游戏！", [.ok]))
+                return false
             case .noMicrosoftAccount:
                 if Locale.current.region?.identifier == "CN" {
                     if [3, 8, 15, 30, 50, 70, 90, 110, 130, 180, 220, 280, 330, 380, 450, 550, 660, 750, 880, 950, 1100, 1300, 1500, 1700, 1900].contains(AppSettings.shared.launchCount) {

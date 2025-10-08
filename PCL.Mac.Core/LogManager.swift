@@ -17,6 +17,7 @@ public class LogManager {
     
     public init(fileURL: URL) {
         if !FileManager.default.fileExists(atPath: fileURL.path) {
+            try? FileManager.default.createDirectory(at: SharedConstants.shared.logURL.parent(), withIntermediateDirectories: true)
             FileManager.default.createFile(atPath: fileURL.path, contents: nil)
         }
         self.fileHandle = try! FileHandle(forWritingTo: fileURL)
