@@ -102,6 +102,14 @@ struct AboutView: View {
                         buttonName: "GitHub 仓库",
                         buttonURL: "https://github.com/PCL-Community/PCL.Proto"
                     )
+                    
+                    ProfileCard(
+                        imageName: "functy23",
+                        name: "FUNCTY",
+                        description: "制作了部分图片",
+                        buttonName: "GitHub 主页",
+                        buttonURL: "https://github.com/functy23"
+                    )
                 }
                 .padding(.leading)
                 .padding(.trailing)
@@ -110,9 +118,10 @@ struct AboutView: View {
             
             StaticMyCard(index: 2, title: "许可与版权声明") {
                 VStack(spacing: 0) {
-                    DependencyView(name: "SwiftyJSON", license: "MIT", repo: "SwiftyJSON/SwiftyJSON")
-                    DependencyView(name: "ZIPFoundation", license: "MIT", repo: "weichsel/ZIPFoundation")
-                    DependencyView(name: "PCL.Mac.Daemon", description: "自动导出启动器崩溃报告的守护进程", license: "MIT", repo: "CeciliaStudio/PCL.Mac.Daemon")
+                    DependencyView(name: "SwiftyJSON", license: "MIT License", repo: "SwiftyJSON/SwiftyJSON")
+                    DependencyView(name: "ZIPFoundation", license: "MIT License", repo: "weichsel/ZIPFoundation")
+                    DependencyView(name: "PCL.Mac.Daemon", description: "自动导出启动器崩溃报告的守护进程", license: "MIT License", repo: "CeciliaStudio/PCL.Mac.Daemon")
+                    DependencyView(name: "TOMLKit", license: "MIT License", repo: "https://github.com/LebJe/TOMLKit")
                 }
             }
             .padding()
