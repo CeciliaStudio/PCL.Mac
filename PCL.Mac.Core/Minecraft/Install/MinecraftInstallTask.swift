@@ -50,21 +50,6 @@ public class MinecraftInstallTask: InstallTask {
                 at: SharedConstants.shared.applicationResourcesURL.appending(path: version >= _1_12_2 ? "log4j2.xml" : "log4j2-1.12-.xml"),
                 to: targetURL
             )
-            
-            // 修改清单中的 id
-            let manifestURL = instanceURL.appending(path: "\(instanceURL.lastPathComponent).json")
-            guard FileManager.default.fileExists(atPath: manifestURL.path),
-                  let data = try FileHandle(forReadingFrom: manifestURL).readToEnd(),
-                  var dict = try JSON(data: data).dictionaryObject else {
-                return
-            }
-            dict["id"] = instanceURL.lastPathComponent
-            try JSONSerialization.data(withJSONObject: dict, options: .prettyPrinted).write(to: manifestURL)
-            
-            // 初始化实例
-            let instance = MinecraftInstance.create(directory: minecraftDirectory, runningDirectory: instanceURL)
-            instance?.config.minecraftVersion = version.displayName
-            instance?.saveConfig()
         } catch {
             try? FileManager.default.removeItem(at: instanceURL)
             throw error
