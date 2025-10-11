@@ -11,7 +11,7 @@ import SwiftyJSON
 
 fileprivate struct ModItem: Identifiable {
     let id: UUID = .init()
-    let mod: Mod
+    let mod: ModInfo
     let url: URL
 }
 
@@ -20,7 +20,7 @@ struct InstanceModsView: View {
     @State private var searchQuery: String = ""
     @State private var mods: [ModItem]? = nil
     @State private var error: Error?
-    @State private var filter: (Mod) -> Bool = { _ in true }
+    @State private var filter: (ModInfo) -> Bool = { _ in true }
     
     private let taskID: UUID = .init()
     let instance: MinecraftInstance
@@ -112,15 +112,22 @@ struct InstanceModsView: View {
             }
             .scrollIndicators(.never)
             .task(id: taskID) {
+                // 当模组列表已被加载或实例不可安装 Mod 时，直接返回
                 if mods != nil || instance.clientBrand == .vanilla { return }
                 do {
                     var mods: [ModItem] = []
+                    // 获取所有可能的模组文件
                     let files = try FileManager.default.contentsOfDirectory(at: instance.runningDirectory.appending(path: "mods"), includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
                     let modFiles = files.filter { $0.pathExtension.lowercased() == "jar" || $0.pathExtension.lowercased() == "disabled" }
                     for modFile in modFiles {
-                        if let mod = Mod.loadMod(url: modFile) {
+                        // 避免视图被释放时一直占用
+                        try Task.checkCancellation()
+                        // 尝试加载模组
+                        if let mod = ModInfo.loadMod(url: modFile) {
                             mods.append(.init(mod: mod, url: modFile))
-                            loadSummary(mod: mod)
+                            let jarName: String = modFile.pathExtension == "jar"
+                            ? modFile.lastPathComponent : String(modFile.lastPathComponent.dropLast(9))
+                            await loadSummary(mod: mod, jarName: jarName)
                         }
                     }
                     mods = mods.sorted { ($0.mod.name.first ?? " ") < ($1.mod.name.first ?? " ") }
@@ -128,39 +135,48 @@ struct InstanceModsView: View {
                         self.mods = mods
                     }
                 } catch {
-                    self.error = error
+                    if !(error is CancellationError) {
+                        self.error = error
+                    }
                 }
             }
         }
     }
     
-    private func loadSummary(mod: Mod) {
-        Task {
-            if let summary = try? await ModrinthProjectSearcher.shared.get(mod.id) { // 若 slug 与 Mod ID 一致，使用通过 Mod ID 获取到的 Project
-                await MainActor.run {
-                    mod.summary = summary
-                }
-            } else { // 否则搜索最匹配的 Mod
-                if let summary = try? await ModrinthProjectSearcher.shared.search(
-                    type: .mod,
-                    query: mod.name,
-                    version: instance.version,
-                    loader: instance.clientBrand,
-                    limit: 1
-                ).first {
-                    await MainActor.run {
-                        mod.summary = summary
-                    }
-                } else {
-                    warn("未找到 \(mod.id) 对应的 Modrinth Project")
-                }
+    /// 获取 Mod 的 Modrinth Project summary 并赋值。
+    /// - Parameters:
+    ///   - mod: Mod 的 ModInfo 对象
+    ///   - jarName: Mod 的 jar 名
+    private func loadSummary(mod: ModInfo, jarName: String) async {
+        let projectSummary: ProjectSummary?
+        if let slug: String = instance.config.mods[jarName] { // 尝试从缓存获取该 Mod 的 slug
+            projectSummary = try? await ModrinthProjectSearcher.shared.get(slug)
+        } else if let summary: ProjectSummary = try? await ModrinthProjectSearcher.shared.get(mod.id) { // 若 slug 与 Mod ID 一致，使用通过 Mod ID 获取到的 Project
+            projectSummary = summary
+            
+        } else { // 否则搜索最匹配的 Mod
+            if let summary: ProjectSummary = try? await ModrinthProjectSearcher.shared.search(
+                type: .mod,
+                query: mod.name,
+                version: instance.version,
+                loader: instance.clientBrand,
+                limit: 1
+            ).first {
+                projectSummary = summary
+            } else {
+                warn("未找到 \(mod.id) 对应的 Modrinth Project")
+                projectSummary = nil
             }
+        }
+        mod.summary = projectSummary
+        if instance.config.mods[jarName] == nil {
+            instance.config.mods[jarName] = projectSummary?.modId
         }
     }
     
     struct ModView: View {
         @ObservedObject private var dataManager: DataManager = .shared
-        @ObservedObject private var mod: Mod
+        @ObservedObject private var mod: ModInfo
         @ObservedObject private var state: ProjectSearchViewState = StateManager.shared.projectSearch
         @State private var isHovered: Bool = false
         @State private var isSwitching = false

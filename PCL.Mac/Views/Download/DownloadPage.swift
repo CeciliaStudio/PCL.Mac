@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftyJSON
 
 struct DownloadPage: View {
     let version: MinecraftVersion
@@ -109,15 +110,15 @@ struct DownloadPage: View {
                         }
                         
                         if DataManager.shared.inprogressInstallTasks != nil { return }
-                        let directory = AppSettings.shared.currentMinecraftDirectory!
+                        let directory: MinecraftDirectory = MinecraftDirectoryManager.shared.current
                         let instanceURL = directory.versionsURL.appending(path: name)
                         
                         // 如果选择了加载器，添加加载器安装任务
                         if let loader {
                             let task: InstallTask? =
                             switch loader.loader {
-                            case .fabric: FabricInstallTask(instanceURL: instanceURL, loaderVersion: loader.version)
-                            case .forge, .neoforge: ForgeInstallTask(instanceURL: instanceURL, loaderVersion: loader.version, isNeoforge: loader.loader == .neoforge)
+                            case .fabric: FabricInstallTask(directory: directory, instanceURL: instanceURL, loaderVersion: loader.version)
+                            case .forge, .neoforge: ForgeInstallTask(directory: directory, instanceURL: instanceURL, loaderVersion: loader.version, isNeoforge: loader.loader == .neoforge)
                             default: nil
                             }
                             tasks.addTask(key: loader.loader.rawValue, task: task!)
@@ -135,7 +136,8 @@ struct DownloadPage: View {
                             switch result {
                             case .success(_):
                                 hint("\(name) 安装完成！", .finish)
-                                AppSettings.shared.defaultInstance = name
+                                onInstallFinish(directory: directory, instanceURL: instanceURL, name: name)
+                                MinecraftDirectoryManager.shared.setDefaultInstance(name)
                             case .failure(let failure):
                                 PopupManager.shared.show(.init(.error, "Minecraft 安装失败", "\(failure.localizedDescription)\n若要寻求帮助，请进入设置 > 其它 > 打开日志，将选中的文件发给别人，而不是发送此页面的照片或截图。", [.ok]))
                             }
@@ -149,13 +151,33 @@ struct DownloadPage: View {
         }
     }
     
+    private func onInstallFinish(directory: MinecraftDirectory, instanceURL: URL, name: String) {
+        do {
+            // 修改清单中的 id
+            let manifestURL = instanceURL.appending(path: "\(instanceURL.lastPathComponent).json")
+            guard FileManager.default.fileExists(atPath: manifestURL.path),
+                  let data = try FileHandle(forReadingFrom: manifestURL).readToEnd(),
+                  var dict = try JSON(data: data).dictionaryObject else {
+                return
+            }
+            dict["id"] = instanceURL.lastPathComponent
+            try JSONSerialization.data(withJSONObject: dict, options: [.prettyPrinted, .withoutEscapingSlashes]).write(to: manifestURL)
+            
+            // 初始化实例
+            let instance = MinecraftInstance.create(directory: directory, runningDirectory: instanceURL)
+            instance?.config.minecraftVersion = version.displayName
+            instance?.saveConfig()
+        } catch {
+            err("无法修改 id: \(error.localizedDescription)")
+        }
+    }
+    
     private func checkName() {
         if name == version.displayName && loader != nil {
             errorMessage = "带 Mod 加载器的实例名不能与版本号一致！"
         } else if name.isEmpty {
             errorMessage = "实例名不能为空！"
-        } else if let directory = AppSettings.shared.currentMinecraftDirectory,
-                  FileManager.default.fileExists(atPath: directory.versionsURL.appending(path: name).path) {
+        } else if FileManager.default.fileExists(atPath: MinecraftDirectoryManager.shared.current.versionsURL.appending(path: name).path) {
             errorMessage = "已有同名实例！"
         } else {
             errorMessage = ""

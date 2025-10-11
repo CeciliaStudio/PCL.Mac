@@ -103,9 +103,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             try? FileManager.default.createDirectory(at: SharedConstants.shared.temperatureURL, withIntermediateDirectories: true)
         }
         FileManager.default.createFile(atPath: Self.exitFlagURL.path, contents: nil)
-        LogStore.shared.clear()
         let start = Date().timeIntervalSince1970
         log("App 已启动")
+        PropertyStorage.loadAll()
         checkOldPreferences()
         _ = AppSettings.shared
         registerCustomFonts()
@@ -140,12 +140,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window = Window(contentView: hostingView)
         window.makeKeyAndOrderFront(nil)
         
-        if AppSettings.shared.showPclMacPopup {
+        if AppSettings.shared.showPCLMacPopup {
             Task {
                 if await PopupManager.shared.showAsync(
                     .init(.normal, "欢迎使用 PCL.Mac！", "本启动器是 Plain Craft Launcher（作者：龙腾猫跃）的非官方衍生版。\n若要反馈问题，请在 GitHub 上开 Issue。", [.init(label: "永久关闭", style: .normal), .close])
                 ) == 0 {
-                    AppSettings.shared.showPclMacPopup = false
+                    AppSettings.shared.showPCLMacPopup = false
                 }
             }
         } else { // 确保不会两个 Popup 叠加
@@ -178,8 +178,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        MinecraftDirectoryManager.shared.save()
+        PropertyStorage.saveAll()
+        log("PropertyStorage 保存完成")
         try? FileManager.default.removeItem(at: Self.exitFlagURL)
-        LogStore.shared.save()
         return .terminateNow
     }
     

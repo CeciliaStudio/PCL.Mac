@@ -24,9 +24,9 @@ class DataManager: ObservableObject {
     @Published var launchState: LaunchState?
     
     var defaultInstance: MinecraftInstance? {
-        if let directory = AppSettings.shared.currentMinecraftDirectory,
-           let defaultInstance = AppSettings.shared.defaultInstance,
-           let instance = MinecraftInstance.create(directory, defaultInstance) {
+        let directory: MinecraftDirectory = MinecraftDirectoryManager.shared.current
+        if let defaultInstance = directory.config.defaultInstance,
+           let instance = MinecraftInstance.create(directory: directory, name: defaultInstance) {
             return instance
         }
         return nil

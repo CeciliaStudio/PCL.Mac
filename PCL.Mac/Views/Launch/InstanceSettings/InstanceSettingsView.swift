@@ -15,9 +15,7 @@ struct InstanceSettingsView: View, SubRouteContainer {
     private let instance: MinecraftInstance!
     
     init() {
-        if let directory = AppSettings.shared.currentMinecraftDirectory,
-           let defaultInstance = AppSettings.shared.defaultInstance,
-           let instance = MinecraftInstance.create(directory.versionsURL.appending(path: defaultInstance)) {
+        if let instance = DataManager.shared.defaultInstance {
             self.instance = instance
         } else {
             self.instance = nil

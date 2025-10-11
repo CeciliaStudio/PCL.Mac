@@ -6,115 +6,66 @@
 //
 
 import Foundation
-import SwiftUI
+import os
 
-class LogLine: Identifiable {
-    let id: UUID = UUID()
-    let string: String
+public class LogManager {
+    public static let shared: LogManager = .init(fileURL: SharedConstants.shared.logURL)
+    private let fileHandle: FileHandle
     
-    init(_ string: String) {
-        self.string = string
-    }
-}
-
-final class LogStore {
-    let dateFormatter = DateFormatter()
-    static let shared = LogStore()
-    private var logs: [String] = []
-    var logLines: [LogLine] = []
-    private let maxCapacity = 10_000
-    private let writeImmediately = true
+    private let logQueue: DispatchQueue = .init(label: "PCL.Mac.Log")
+    private let logger: Logger = Logger()
     
-    private let queue = DispatchQueue(label: "io.github.pcl-community.LogStoreQueue")
-
-    private init() {
-        dateFormatter.dateFormat = "[yyyy-MM-dd] [HH:mm:ss.SSS]"
-        dateFormatter.timeZone = TimeZone(identifier: "Asia/Shanghai")
-    }
-    
-    func append(_ message: String, _ level: String, _ caller: String) {
-        appendRaw(
-            "\(dateFormatter.string(from: Date())) [\(level)] \(caller): \(message)",
-            LogLine("[\(level)] \(caller): \(message)")
-        )
-    }
-    
-    func appendRaw(_ message: String, _ line: LogLine? = nil, write: Bool = true) {
-        queue.async {
-            if self.logs.count >= self.maxCapacity {
-                self.logs.removeFirst(1000)
-            }
-            if self.logLines.count >= 200 {
-                self.logLines.removeFirst(100)
-            }
-            self.logs.append(message)
-            if SharedConstants.shared.isDevelopment {
-                self.logLines.append(line ?? LogLine(message))
-            }
-            if self.writeImmediately && write {
-                self.appendToDisk(message + "\n")
-            }
-            print(message)
+    public init(fileURL: URL) {
+        if !FileManager.default.fileExists(atPath: fileURL.path) {
+            try? FileManager.default.createDirectory(at: SharedConstants.shared.logURL.parent(), withIntermediateDirectories: true)
+            FileManager.default.createFile(atPath: fileURL.path, contents: nil)
         }
+        self.fileHandle = try! FileHandle(forWritingTo: fileURL)
+        try? self.fileHandle.truncate(atOffset: 0)
     }
     
-    func appendToDisk(_ content: String, _ callback: ((Bool) -> Void)? = nil) {
+    public func log(message: Any, level: String, file: String = #file, line: Int = #line) {
+        // 构建日志字符串
+        let time: String = DateFormatters.shared.logDateFormatter.string(from: Date())
+        let caller: String = "\(URL(fileURLWithPath: file).lastPathComponent):\(line)"
+        let content: String = String(format: "%@ [%@] %@: %@", time, level, caller, String(describing: message))
+        // 输出
+        switch level {
+        case "WARN": logger.error("\(content)")
+        case "ERROR": logger.fault("\(content)")
+        case "DEBUG": logger.debug("\(content)")
+        default: print(content)
+        }
+        // 写入文件
         do {
-            try FileManager.writeLog(content)
-            callback?(true)
+            try fileHandle.write(contentsOf: (content + "\n").data(using: .utf8).unwrap("无法编码日志行。"))
         } catch {
-            err("日志保存失败: \(error.localizedDescription)")
-            callback?(false)
+            print("无法写入日志: \(error)")
         }
     }
     
-    func clear() {
-        try? FileManager.default.removeItem(at: SharedConstants.shared.logURL)
+    public func info(_ message: Any, file: String = #file, line: Int = #line) {
+        log(message: message, level: "INFO", file: file, line: line)
     }
     
-    func save() {
-        if !writeImmediately {
-            queue.async {
-                let allLogs = self.logs.joined(separator: "\n")
-                self.appendToDisk(allLogs) { isSuccess in
-                    if isSuccess {
-                        log("日志保存成功")
-                    }
-                    log("已触发进程终止")
-                    DispatchQueue.main.async {
-                        NSApp.reply(toApplicationShouldTerminate: true)
-                    }
-                }
-            }
-        }
+    public func warn(_ message: Any, file: String = #file, line: Int = #line) {
+        log(message: message, level: "WARN", file: file, line: line)
+    }
+    
+    public func error(_ message: Any, file: String = #file, line: Int = #line) {
+        log(message: message, level: "ERROR", file: file, line: line)
+    }
+    
+    public func debug(_ message: Any, file: String = #file, line: Int = #line) {
+        log(message: message, level: "DEBUG", file: file, line: line)
     }
 }
 
-public struct LogManager {
-    public static func log(_ message: Any, file: String = #file, line: Int = #line) {
-        LogStore.shared.append(String(describing: message), "INFO", file.split(separator: "/").last! + ":" + String(line))
-    }
+public func log(_ message: Any, file: String = #file, line: Int = #line) { LogManager.shared.info(message, file: file, line: line) }
 
-    public static func warn(_ message: Any, file: String = #file, line: Int = #line) {
-        LogStore.shared.append(String(describing: message), "WARN", file.split(separator: "/").last! + ":" + String(line))
-    }
+public func warn(_ message: Any, file: String = #file, line: Int = #line) { LogManager.shared.warn(message, file: file, line: line) }
 
-    public static func err(_ message: Any, file: String = #file, line: Int = #line) {
-        LogStore.shared.append(String(describing: message), "ERROR", file.split(separator: "/").last! + ":" + String(line))
-    }
+public func err(_ message: Any, file: String = #file, line: Int = #line) { LogManager.shared.error(message, file: file, line: line) }
 
-    public static func debug(_ message: Any, file: String = #file, line: Int = #line) {
-        LogStore.shared.append(String(describing: message), "DEBUG", file.split(separator: "/").last! + ":" + String(line))
-    }
-
-    public static func raw(_ message: Any) {
-        LogStore.shared.appendRaw(String(describing: message), write: false)
-    }
-}
-
-public func log(_ message: Any, file: String = #file, line: Int = #line) { LogManager.log(message, file: file, line: line) }
-public func warn(_ message: Any, file: String = #file, line: Int = #line) { LogManager.warn(message, file: file, line: line) }
-public func err(_ message: Any, file: String = #file, line: Int = #line) { LogManager.err(message, file: file, line: line) }
-public func debug(_ message: Any, file: String = #file, line: Int = #line) { LogManager.debug(message, file: file, line: line) }
-public func raw(_ message: Any, file: String = #file, line: Int = #line) { LogManager.raw(message) }
+public func debug(_ message: Any, file: String = #file, line: Int = #line) { LogManager.shared.debug(message, file: file, line: line) }
 

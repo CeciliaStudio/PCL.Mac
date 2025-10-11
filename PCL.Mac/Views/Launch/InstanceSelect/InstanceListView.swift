@@ -10,8 +10,8 @@ import SwiftUI
 struct InstanceListView: View {
     @ObservedObject private var dataManager: DataManager = .shared
     @ObservedObject private var directory: MinecraftDirectory
-    @State private var hasFinishedLoading: Bool = false
-    @State private var error: Error? = nil
+    @MainActor @State private var hasFinishedLoading: Bool = false
+    @MainActor @State private var error: Error? = nil
     
     init(directory: MinecraftDirectory) {
         self.directory = directory
@@ -47,14 +47,18 @@ struct InstanceListView: View {
             }
         }
         .onAppear {
-            AppSettings.shared.currentMinecraftDirectory = directory
+            MinecraftDirectoryManager.shared.current = directory
             if directory.instances.isEmpty {
-                directory.loadInnerInstances { result in
-                    hasFinishedLoading = true
-                    if case .failure(let error) = result {
+                Task {
+                    do {
+                        try await directory.loadInstances()
+                    } catch {
                         self.error = error
                     }
+                    self.hasFinishedLoading = true
                 }
+            } else {
+                hasFinishedLoading = true
             }
         }
     }
@@ -99,7 +103,7 @@ struct InstanceListView: View {
                 }
             }
             .onTapGesture {
-                AppSettings.shared.defaultInstance = info.name
+                MinecraftDirectoryManager.shared.setDefaultInstance(info.name)
                 DataManager.shared.router.setRoot(.launch)
             }
             .onHover { isHovered in

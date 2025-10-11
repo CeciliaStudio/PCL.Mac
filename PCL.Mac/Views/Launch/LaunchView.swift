@@ -148,11 +148,14 @@ fileprivate struct LeftTab: View {
                     dataManager.launchState = launchState
                     
                     Task {
-                        guard await launchPrecheck(launchOptions) else { return }
+                        guard await launchPrecheck(launchOptions) else {
+                            dataManager.launchState = nil
+                            return
+                        }
                         debug("正在启动游戏")
                         await instance.launch(launchOptions, launchState)
                         await MainActor.run {
-                            self.dataManager.launchState = nil
+                            dataManager.launchState = nil
                         }
                     }
                 }
@@ -171,7 +174,7 @@ fileprivate struct LeftTab: View {
                 MyButton(text: "实例选择") {
                     dataManager.router.append(.versionSelect)
                 }
-                if AppSettings.shared.defaultInstance != nil {
+                if MinecraftDirectoryManager.shared.getDefaultInstance() != nil {
                     MyButton(text: "实例设置") {
                         if let instance = self.instance {
                             dataManager.router.append(.instanceSettings(instance: instance))
@@ -200,9 +203,7 @@ fileprivate struct LeftTab: View {
         .frame(width: 300)
         .foregroundStyle(Color(hex: 0x343D4A))
         .onAppear {
-            if let directory = AppSettings.shared.currentMinecraftDirectory,
-               let defaultInstance = AppSettings.shared.defaultInstance,
-               let instance = MinecraftInstance.create(directory.versionsURL.appending(path: defaultInstance)) {
+            if let instance = dataManager.defaultInstance {
                 self.instance = instance
             }
         }
@@ -247,6 +248,7 @@ fileprivate struct LeftTab: View {
             switch error {
             case .missingAccount:
                 PopupManager.shared.show(.init(.error, "错误", "请先创建一个账号并选择再启动游戏！", [.ok]))
+                return false
             case .noMicrosoftAccount:
                 if Locale.current.region?.identifier == "CN" {
                     if [3, 8, 15, 30, 50, 70, 90, 110, 130, 180, 220, 280, 330, 380, 450, 550, 660, 750, 880, 950, 1100, 1300, 1500, 1700, 1900].contains(AppSettings.shared.launchCount) {
@@ -285,7 +287,7 @@ struct LaunchView: View {
             }
             
             if SharedConstants.shared.isDevelopment {
-                StaticMyCard(index: 0, title: "警告") {
+                StaticMyCard(index: 1, title: "警告") {
                     VStack(spacing: 4) {
                         Text("你正在使用开发版本的 PCL.Mac！")
                             .font(.custom("PCL English", size: 14))
@@ -303,28 +305,6 @@ struct LaunchView: View {
                     .foregroundStyle(Color("TextColor"))
                 }
                 .padding()
-                
-                StaticMyCard(index: 1, title: "日志") {
-                    VStack {
-                        ScrollView(.horizontal) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                ForEach(LogStore.shared.logLines) { logLine in
-                                    logLineView(logLine.string)
-                                        .foregroundStyle(Color("TextColor"))
-                                }
-                            }
-                        }
-                        .scrollIndicators(.never)
-                        .padding(.top, 5)
-                        
-                        MyButton(text: "打开日志") {
-                            NSWorkspace.shared.activateFileViewerSelecting([SharedConstants.shared.logURL])
-                        }
-                        .frame(height: 40)
-                    }
-                }
-                .padding()
-                .padding(.bottom, 20)
             }
             Spacer()
         }

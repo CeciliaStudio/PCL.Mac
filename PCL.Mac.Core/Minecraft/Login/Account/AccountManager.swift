@@ -86,9 +86,9 @@ public enum AnyAccount: Account, Identifiable, Equatable {
 public class AccountManager: ObservableObject {
     public static let shared: AccountManager = .init()
     
-    @CodableAppStorage("accounts") public var accounts: [AnyAccount] = []
+    @StoredProperty(.account, "accounts") public var accounts: [AnyAccount] = []
     
-    @CodableAppStorage("accountId") public var accountId: UUID? = nil
+    @StoredProperty(.account, "accountId") public var accountId: UUID? = nil
     
     public func getAccount() -> AnyAccount? {
         if accountId == nil {

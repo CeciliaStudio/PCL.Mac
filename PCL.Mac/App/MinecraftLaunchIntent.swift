@@ -20,11 +20,9 @@ struct MinecraftLaunchIntent: AppIntent {
 
     func perform() async throws -> some IntentResult & ProvidesDialog {
         let before: DispatchTime = .now()
-        guard let directory = AppSettings.shared.currentMinecraftDirectory else {
-            return .result(dialog: "未设置默认 Minecraft 目录。")
-        }
+        let directory: MinecraftDirectory = MinecraftDirectoryManager.shared.current
         
-        let instance = MinecraftInstance.create(directory.versionsURL.appending(path: instanceName))
+        let instance = MinecraftInstance.create(directory: directory, name: instanceName)
         guard let instance = instance else {
             return .result(dialog: .init("实例不存在。"))
         }

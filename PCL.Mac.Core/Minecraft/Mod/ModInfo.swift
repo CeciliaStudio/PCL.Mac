@@ -1,5 +1,5 @@
 //
-//  Mod.swift
+//  ModInfo.swift
 //  PCL.Mac
 //
 //  Created by YiZhiMCQiu on 2025/6/19.
@@ -10,7 +10,7 @@ import SwiftyJSON
 import TOMLKit
 import ZIPFoundation
 
-public class Mod: Identifiable, ObservableObject {
+public class ModInfo: Identifiable, ObservableObject {
     /// 模组 ID
     public let id: String
     
@@ -37,7 +37,7 @@ public class Mod: Identifiable, ObservableObject {
         self.version = version
     }
     
-    public static func loadMod(url: URL) -> Mod? {
+    public static func loadMod(url: URL) -> ModInfo? {
         do {
             let archive = try Archive(url: url, accessMode: .read)
             if ArchiveUtil.hasEntry(archive: archive, name: "fabric.mod.json") {
@@ -53,7 +53,7 @@ public class Mod: Identifiable, ObservableObject {
         return nil
     }
     
-    private static func fromJSON(json: JSON) -> Mod {
+    private static func fromJSON(json: JSON) -> ModInfo {
         return .init(
             id: json["id"].stringValue,
             name: json["name"].stringValue,
@@ -63,7 +63,7 @@ public class Mod: Identifiable, ObservableObject {
         )
     }
     
-    private static func fromTOML(string: String, brand: ClientBrand) throws -> Mod {
+    private static func fromTOML(string: String, brand: ClientBrand) throws -> ModInfo {
         let table = try TOMLTable(string: string)
         let modTable = try table["mods"].unwrap().array.unwrap()[0].table.unwrap()
         

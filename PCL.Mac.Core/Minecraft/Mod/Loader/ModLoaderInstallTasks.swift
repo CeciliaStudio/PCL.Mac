@@ -9,16 +9,18 @@ import Foundation
 
 // MARK: - Fabric 安装任务定义
 public class FabricInstallTask: InstallTask {
+    private let directory: MinecraftDirectory
     private let instanceURL: URL
     private let loaderVersion: String
     
-    public init(instanceURL: URL, loaderVersion: String) {
+    public init(directory: MinecraftDirectory, instanceURL: URL, loaderVersion: String) {
+        self.directory = directory
         self.instanceURL = instanceURL
         self.loaderVersion = loaderVersion
     }
     
     public override func startTask() async throws {
-        let instance = try MinecraftInstance.create(instanceURL).unwrap("加载实例失败")
+        let instance = try MinecraftInstance.create(directory: directory, runningDirectory: instanceURL).unwrap("加载实例失败")
         try await FabricInstaller.installFabric(
             version: instance.version.unwrap(),
             minecraftDirectory: instance.minecraftDirectory,
@@ -41,22 +43,25 @@ public class FabricInstallTask: InstallTask {
 }
 
 public class ForgeInstallTask: InstallTask {
+    private let directory: MinecraftDirectory
     private let instanceURL: URL
     private let loaderVersion: String
     private let isNeoforge: Bool
     
     public init(
+        directory: MinecraftDirectory,
         instanceURL: URL,
         loaderVersion: String,
         isNeoforge: Bool = false
     ) {
+        self.directory = directory
         self.instanceURL = instanceURL
         self.loaderVersion = loaderVersion
         self.isNeoforge = isNeoforge
     }
     
     public override func startTask() async throws {
-        let instance = try MinecraftInstance.create(instanceURL).unwrap("加载实例失败")
+        let instance = try MinecraftInstance.create(directory: directory, runningDirectory: instanceURL).unwrap("加载实例失败")
         setStage(.installForge)
         let constructor: (MinecraftDirectory, URL, ClientManifest, ((Double) -> Void)?) -> ForgeInstaller = isNeoforge ? NeoforgeInstaller.init : ForgeInstaller.init
         let installer = constructor(instance.minecraftDirectory, instance.runningDirectory, instance.manifest, setProgress(_:))
