@@ -46,5 +46,5 @@ struct MyListItem<Content: View>: View {
 }
 
 #Preview {
-    MinecraftDownloadView()
+    MinecraftVersionListView()
 }

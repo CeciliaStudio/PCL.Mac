@@ -172,7 +172,7 @@ fileprivate struct LeftTab: View {
             }
             HStack(spacing: 12) {
                 MyButton(text: "实例选择") {
-                    dataManager.router.append(.versionSelect)
+                    dataManager.router.append(.instanceSelect)
                 }
                 if MinecraftDirectoryManager.shared.getDefaultInstance() != nil {
                     MyButton(text: "实例设置") {
@@ -277,7 +277,6 @@ fileprivate struct LeftTab: View {
 struct LaunchView: View {
     @ObservedObject private var dataManager: DataManager = .shared
     @ObservedObject private var announcementManager: AnnouncementManager = .shared
-    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         ScrollView {

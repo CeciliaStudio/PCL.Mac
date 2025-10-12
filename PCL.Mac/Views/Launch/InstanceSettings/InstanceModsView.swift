@@ -47,12 +47,12 @@ struct InstanceModsView: View {
                         HStack(spacing: 24) {
                             MyButton(text: "转到下载页面", foregroundStyle: AppSettings.shared.theme.getTextStyle()) {
                                 dataManager.router.setRoot(.download)
-                                dataManager.router.append(.minecraftDownload)
+                                dataManager.router.append(.minecraftVersionList)
                             }
                             .frame(width: 170, height: 40)
                             
                             MyButton(text: "实例选择") {
-                                dataManager.router.setRoot(.versionSelect)
+                                dataManager.router.setRoot(.instanceSelect)
                             }
                             .frame(width: 170, height: 40)
                         }

@@ -20,16 +20,17 @@ public enum AppRoute: Hashable {
     case accountList
     case newAccount
     case installing(tasks: InstallTasks)
-    case versionSelect
+    case instanceSelect
     case projectDownload(summary: ProjectSummary)
     case announcementHistory
     case instanceSettings(instance: MinecraftInstance)
     case directoryConfig(directory: MinecraftDirectory)
+    case minecraftInstall(version: MinecraftVersion)
     
     // MyList 导航
-    case minecraftDownload
+    case minecraftVersionList
     case projectSearch(type: ProjectType)
-    case versionList(directory: MinecraftDirectory)
+    case instanceList(directory: MinecraftDirectory)
     case instanceOverview
     case instanceConfig
     case instanceMods
@@ -47,7 +48,7 @@ public enum AppRoute: Hashable {
     var isRoot: Bool {
         switch self {
         case .launch, .download, .multiplayer, .settings, .others,
-                .minecraftDownload, .projectSearch(_),
+                .minecraftVersionList, .projectSearch(_),
                 .about, .toolbox, .debug,
                 .personalization, .javaSettings, .otherSettings:
             return true
@@ -60,7 +61,7 @@ public enum AppRoute: Hashable {
         switch self {
         case .installing(let task): "installing?task=\(task.id)"
         case .projectDownload(let summary): "projectDownload?summary=\(summary.modId)"
-        case .versionList(let directory): "versionList?rootURL=\(directory.rootURL.path)"
+        case .instanceList(let directory): "versionList?rootURL=\(directory.rootURL.path)"
         case .instanceSettings(let instance): "versionSettings?instance=\(instance.name)"
         case .projectSearch(let type): "projectSearch?type=\(type)"
         default:
@@ -71,7 +72,7 @@ public enum AppRoute: Hashable {
     var title: String {
         switch self {
         case .installing(_): "下载管理"
-        case .versionSelect, .versionList: "实例选择"
+        case .instanceSelect, .instanceList: "实例选择"
         case .projectDownload(let summary): "资源下载 - \(summary.name)"
         case .accountManagement, .accountList, .newAccount: "账号管理"
         case .announcementHistory: "历史公告"
@@ -79,13 +80,14 @@ public enum AppRoute: Hashable {
         case .javaDownload: "Java 下载"
         case .themeUnlock: "主题解锁"
         case .directoryConfig(let directory): "目录配置 - \(directory.config.name)"
+        case .minecraftInstall(let version): "Minecraft 安装 - \(version.displayName)"
         default: "发现问题请在 https://github.com/CeciliaStudio/PCL.Mac/issues/new 上反馈！"
         }
     }
     
     func isSame(_ another: AppRoute) -> Bool {
-        if case .versionList(let directory1) = self,
-           case .versionList(let directory2) = another {
+        if case .instanceList(let directory1) = self,
+           case .instanceList(let directory2) = another {
             return directory1.rootURL == directory2.rootURL
         }
         
@@ -94,42 +96,49 @@ public enum AppRoute: Hashable {
 }
 
 public class AppRouter: ObservableObject {
-    @Published public var path: [AppRoute] = [.launch]
+    @Published public var path: [AppRoute] = [.launch] {
+        didSet {
+            routeID = UUID()
+        }
+    }
+    private var routeID: UUID = UUID()
     
     public func append(_ route: AppRoute) {
         path.append(route)
     }
     
-    public func getLastView() -> any View {
+    public func makeView() -> any View {
         switch getLast() {
         case .launch:
-            LaunchView()
+            LaunchView().id(routeID)
         case .accountManagement, .accountList, .newAccount:
-            AccountManagementView()
-        case .download, .minecraftDownload, .projectSearch(_):
-            DownloadView()
+            AccountManagementView().id(routeID)
+        case .download, .minecraftVersionList, .projectSearch(_):
+            DownloadView().id(routeID)
         case .multiplayer:
-            MultiplayerView()
+            MultiplayerView().id(routeID)
         case .settings, .personalization, .javaSettings, .otherSettings:
-            SettingsView()
+            SettingsView().id(routeID)
         case .others, .about, .toolbox, .debug:
-            OthersView()
+            OthersView().id(routeID)
         case .installing(let tasks):
-            InstallingView(tasks: tasks)
-        case .versionSelect, .versionList(_):
-            InstanceSelectView()
+            InstallingView(tasks: tasks).id(routeID)
+        case .instanceSelect, .instanceList(_):
+            InstanceSelectView().id(routeID)
         case .projectDownload(let summary):
-            ProjectDownloadView(id: summary.modId)
+            ProjectDownloadView(id: summary.modId).id(routeID)
         case .announcementHistory:
-            AnnouncementHistoryView()
+            AnnouncementHistoryView().id(routeID)
         case .instanceSettings, .instanceOverview, .instanceConfig, .instanceMods:
-            InstanceSettingsView()
+            InstanceSettingsView().id(routeID)
         case .javaDownload:
-            JavaInstallView()
+            JavaInstallView().id(routeID)
         case .themeUnlock:
-            ThemeUnlockView()
+            ThemeUnlockView().id(routeID)
         case .directoryConfig(let directory):
-            DirectoryConfigView(directory: directory)
+            DirectoryConfigView(directory: directory).id(routeID)
+        case .minecraftInstall(let version):
+            MinecraftInstallView(version).id(routeID)
         }
     }
     

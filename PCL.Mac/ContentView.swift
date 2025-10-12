@@ -72,7 +72,7 @@ struct ContentView: View {
     // MARK: - body
     var body: some View {
         ZStack {
-            createViewFromRouter()
+            content
             ForEach(overlayManager.overlays) { overlay in
                 overlay.view
                     .offset(CGSize(width: overlay.position.x, height: overlay.position.y))
@@ -98,7 +98,7 @@ struct ContentView: View {
         }
     }
     
-    private func createViewFromRouter() -> some View {
+    private var content: some View {
         VStack(spacing: 0) {
             Group {
                 if dataManager.router.getLast().isRoot {
@@ -124,7 +124,8 @@ struct ContentView: View {
                             }
                     )
                     .zIndex(1)
-                AnyView(dataManager.router.getLastView())
+                
+                AnyView(dataManager.router.makeView())
                     .foregroundStyle(Color("TextColor"))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }

@@ -75,11 +75,11 @@ struct TitleBarView: View {
                         .foregroundStyle(AppSettings.shared.theme.getTextStyle())
                 }
                 Spacer()
-                MenuItemButton(route: .launch, parent: self)
-                MenuItemButton(route: .download, parent: self)
+                MenuItemButton(route: .launch)
+                MenuItemButton(route: .download)
 //                MenuItemButton(route: .multiplayer, parent: self)
-                MenuItemButton(route: .settings, parent: self)
-                MenuItemButton(route: .others, parent: self)
+                MenuItemButton(route: .settings)
+                MenuItemButton(route: .others)
             }
         }
     }
@@ -101,11 +101,31 @@ struct SubviewTitleBarView: View {
 
 struct MenuItemButton: View {
     @ObservedObject private var dataManager: DataManager = DataManager.shared
-    
-    let route: AppRoute
-    let parent: TitleBarView
-    var icon: Image?
     @State private var isHovered = false
+    
+    private let route: AppRoute
+    private let label: String
+    private let imageName: String
+    
+    init(route: AppRoute) {
+        self.route = route
+        self.label = switch route {
+        case .launch: "启动"
+        case .download: "下载"
+        case .multiplayer: "联机"
+        case .settings: "设置"
+        case .others: "更多"
+        default: ""
+        }
+        self.imageName = switch route {
+        case .launch: "LaunchIcon"
+        case .download: "DownloadIcon"
+        case .multiplayer: "MultiplayerIcon"
+        case .settings: "SettingsIcon"
+        case .others: "OthersIcon"
+        default: ""
+        }
+    }
     
     var body: some View {
         ZStack {
@@ -113,16 +133,14 @@ struct MenuItemButton: View {
                 .foregroundStyle(dataManager.router.getRoot() == route ? .white : (isHovered ? Color(hex: 0xFFFFFF, alpha: 0.17) : .clear))
             
             HStack {
-                getImage()
+                Image(imageName)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 16, height: 16)
-                    .foregroundStyle(dataManager.router.getRoot() == route ?
-                                     AnyShapeStyle(AppSettings.shared.theme.getTextStyle()) : AnyShapeStyle(.white))
-                Text(getText())
-                    .foregroundStyle(dataManager.router.getRoot() == route ?
-                                     AnyShapeStyle(AppSettings.shared.theme.getTextStyle()) : AnyShapeStyle(.white))
+                Text(label)
             }
+            .foregroundStyle(dataManager.router.getRoot() == route ?
+                             AnyShapeStyle(AppSettings.shared.theme.getTextStyle()) : AnyShapeStyle(.white))
         }
         .frame(width: 75, height: 27)
         .animation(.easeInOut(duration: 0.2), value: isHovered)
@@ -135,31 +153,8 @@ struct MenuItemButton: View {
                     }
                 }
         )
-        .onHover { hover in
-            isHovered = hover
-        }
-    }
-    
-    private func getImage() -> Image {
-        let key = switch route {
-        case .launch: "LaunchIcon"
-        case .download: "DownloadIcon"
-        case .multiplayer: "MultiplayerIcon"
-        case .settings: "SettingsIcon"
-        case .others: "OthersIcon"
-        default: ""
-        }
-        return Image(key)
-    }
-    
-    private func getText() -> String {
-        return switch route {
-        case .launch: "启动"
-        case .download: "下载"
-        case .multiplayer: "联机"
-        case .settings: "设置"
-        case .others: "更多"
-        default: ""
+        .onHover { isHovered in
+            self.isHovered = isHovered
         }
     }
 }

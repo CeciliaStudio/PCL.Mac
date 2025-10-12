@@ -13,7 +13,7 @@ struct InstanceSelectView: View, SubRouteContainer {
     var body: some View {
         Group {
             switch dataManager.router.getLast() {
-            case .versionList(let directory):
+            case .instanceList(let directory):
                 InstanceListView(directory: directory)
                     .id(directory.rootURL)
             default:
@@ -24,7 +24,7 @@ struct InstanceSelectView: View, SubRouteContainer {
             dataManager.leftTab(300) {
                 LeftTab()
             }
-            dataManager.router.append(.versionList(directory: MinecraftDirectoryManager.shared.current))
+            dataManager.router.append(.instanceList(directory: MinecraftDirectoryManager.shared.current))
         }
     }
 }
@@ -43,10 +43,10 @@ fileprivate struct LeftTab: View {
                 .padding(.top, 20)
                 .padding(.bottom, 4)
             MyList(
-                cases: MinecraftDirectoryManager.shared.directories.map(AppRoute.versionList(directory:)),
+                cases: MinecraftDirectoryManager.shared.directories.map(AppRoute.instanceList(directory:)),
                 height: 42,
             ) { route, isSelected in
-                if case .versionList(let directory) = route {
+                if case .instanceList(let directory) = route {
                     MinecraftDirectoryListItem(directory: directory)
                         .foregroundStyle(isSelected ? AnyShapeStyle(settings.theme.getTextStyle()) : AnyShapeStyle(Color("TextColor")))
                 } else {

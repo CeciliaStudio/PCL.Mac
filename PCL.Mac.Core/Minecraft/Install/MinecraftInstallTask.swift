@@ -18,7 +18,7 @@ public class MinecraftInstallTask: InstallTask {
         instanceURL: URL,
         version: MinecraftVersion,
         minecraftDirectory: MinecraftDirectory,
-        architecture: Architecture = .system,
+        architecture: Architecture = .system
     ) {
         self.instanceURL = instanceURL
         self.version = version

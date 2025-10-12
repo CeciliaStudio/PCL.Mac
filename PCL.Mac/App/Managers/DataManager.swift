@@ -15,7 +15,7 @@ class DataManager: ObservableObject {
     @Published var javaVirtualMachines: [JavaVirtualMachine] = []
     @Published var lastTimeUsed: Int = 0
     @Published var networkMonitor: NetworkSpeedMonitor = NetworkSpeedMonitor()
-    @Published var versionManifest: VersionManifest?
+    @Published var versionManifest: VersionManifest!
     @Published var router: AppRouter = .init()
     @Published var leftTabWidth: CGFloat = 310
     @Published var leftTabContent: AnyView = AnyView(EmptyView())

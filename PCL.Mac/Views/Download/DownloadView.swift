@@ -13,8 +13,8 @@ struct DownloadView: View {
     var body: some View {
         Group {
             switch dataManager.router.getLast() {
-            case .minecraftDownload:
-                MinecraftDownloadView()
+            case .minecraftVersionList:
+                MinecraftVersionListView()
             case .projectSearch(let type):
                 ProjectSearchView(type: type)
                     .id(type)
@@ -22,7 +22,7 @@ struct DownloadView: View {
                 Spacer()
                     .onAppear {
                         if dataManager.router.getLast() == .download {
-                            dataManager.router.append(.minecraftDownload)
+                            dataManager.router.append(.minecraftVersionList)
                         }
                     }
             }
@@ -37,7 +37,7 @@ struct DownloadView: View {
                         .padding(.top, 20)
                         .padding(.bottom, 4)
                     MyList(
-                        cases: [.minecraftDownload]
+                        cases: [.minecraftVersionList]
                     ) { type, isSelected in
                         createListItemView(type)
                             .foregroundStyle(isSelected ? AnyShapeStyle(AppSettings.shared.theme.getTextStyle()) : AnyShapeStyle(Color("TextColor")))
@@ -66,7 +66,7 @@ struct DownloadView: View {
     private func createListItemView(_ lastComponent: AppRoute) -> some View {
         let imageName: String, text: String
         switch lastComponent {
-        case .minecraftDownload:
+        case .minecraftVersionList:
             imageName = "GameDownloadIcon"
             text = "游戏下载"
         case .projectSearch(let type):
