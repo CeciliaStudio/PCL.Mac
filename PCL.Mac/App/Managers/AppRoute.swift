@@ -11,7 +11,6 @@ public enum AppRoute: Hashable {
     // 根页面
     case launch
     case download
-    case multiplayer
     case settings
     case others
     
@@ -47,7 +46,7 @@ public enum AppRoute: Hashable {
     
     var isRoot: Bool {
         switch self {
-        case .launch, .download, .multiplayer, .settings, .others,
+        case .launch, .download, .settings, .others,
                 .minecraftVersionList, .projectSearch(_),
                 .about, .toolbox, .debug,
                 .personalization, .javaSettings, .otherSettings:
@@ -115,8 +114,6 @@ public class AppRouter: ObservableObject {
             AccountManagementView().id(routeID)
         case .download, .minecraftVersionList, .projectSearch(_):
             DownloadView().id(routeID)
-        case .multiplayer:
-            MultiplayerView().id(routeID)
         case .settings, .personalization, .javaSettings, .otherSettings:
             SettingsView().id(routeID)
         case .others, .about, .toolbox, .debug:

@@ -75,6 +75,6 @@ public class DownloadSourceManager: DownloadSource {
     
     private init() {
         self.fileDownloadSource = official
-        self.versionManifestSource = official // AppSettings.shared.versionManifestSource == .mirror ? bmclapi : official
+        self.versionManifestSource = AppSettings.shared.versionManifestSource == .mirror ? bmclapi : official
     }
 }

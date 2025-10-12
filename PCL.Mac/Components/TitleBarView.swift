@@ -77,7 +77,6 @@ struct TitleBarView: View {
                 Spacer()
                 MenuItemButton(route: .launch)
                 MenuItemButton(route: .download)
-//                MenuItemButton(route: .multiplayer, parent: self)
                 MenuItemButton(route: .settings)
                 MenuItemButton(route: .others)
             }
@@ -112,7 +111,6 @@ struct MenuItemButton: View {
         self.label = switch route {
         case .launch: "启动"
         case .download: "下载"
-        case .multiplayer: "联机"
         case .settings: "设置"
         case .others: "更多"
         default: ""
@@ -120,7 +118,6 @@ struct MenuItemButton: View {
         self.imageName = switch route {
         case .launch: "LaunchIcon"
         case .download: "DownloadIcon"
-        case .multiplayer: "MultiplayerIcon"
         case .settings: "SettingsIcon"
         case .others: "OthersIcon"
         default: ""

@@ -160,6 +160,14 @@ private class ModpackInstallTask: InstallTask {
         await MainActor.run {
             self.directory.config.defaultInstance = instanceURL.lastPathComponent
         }
+        let manifestURL = instanceURL.appending(path: "\(instanceURL.lastPathComponent).json")
+        guard FileManager.default.fileExists(atPath: manifestURL.path),
+              let data = try FileHandle(forReadingFrom: manifestURL).readToEnd(),
+              var dict = try JSON(data: data).dictionaryObject else {
+            return
+        }
+        dict["id"] = instanceURL.lastPathComponent
+        try JSONSerialization.data(withJSONObject: dict, options: [.prettyPrinted, .withoutEscapingSlashes]).write(to: manifestURL)
     }
     
     override func getStages() -> [InstallStage] {
