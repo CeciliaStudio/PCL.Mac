@@ -24,8 +24,8 @@ struct MyListItem<Content: View>: View {
             .background(
                 RoundedRectangle(cornerRadius: 5)
                     .fill(isHovered ? AppSettings.shared.theme.getAccentColor().opacity(0.1) : .clear)
+                    .animation(.easeInOut(duration: 0.2), value: self.isHovered)
             )
-            .animation(.easeInOut(duration: 0.2), value: self.isHovered)
             .onHover { hover in
                 self.isHovered = hover
             }

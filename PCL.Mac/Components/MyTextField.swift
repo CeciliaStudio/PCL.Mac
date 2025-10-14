@@ -53,8 +53,8 @@ struct MyTextField: View {
             RoundedRectangle(cornerRadius: 4)
                 .stroke(AppSettings.shared.theme.getAccentColor().opacity(self.isHovered ? 1.0 : 0.5), lineWidth: 1.5)
                 .allowsHitTesting(false)
+                .animation(.easeInOut(duration: 0.2), value: self.isHovered)
         }
-        .animation(.easeInOut(duration: 0.2), value: self.isHovered)
         .frame(height: 27)
     }
 }

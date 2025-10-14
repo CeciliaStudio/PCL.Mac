@@ -25,7 +25,6 @@ struct BaseCardContainer<Content: View>: View {
     var body: some View {
         content($isHovered)
             .foregroundStyle(isHovered ? AppSettings.shared.theme.getTextStyle() : .init(Color("TextColor")))
-            .animation(.easeInOut(duration: 0.2), value: isHovered)
             .padding()
             .background(
                 RoundedRectangle(cornerRadius: 5)
@@ -34,11 +33,11 @@ struct BaseCardContainer<Content: View>: View {
                         color: isHovered ? AppSettings.shared.theme.getAccentColor() : .gray,
                         radius: 2, x: 0.5, y: 0.5
                     )
-                    .animation(.easeInOut(duration: 0.2), value: isHovered)
             )
             .padding(.top, -23)
             .opacity(isAppeared ? 1 : 0)
             .offset(y: isAppeared ? 25 : 0)
+            .animation(.easeInOut(duration: 0.2), value: isHovered)
             .onHover { hover in
                 isHovered = hover
             }

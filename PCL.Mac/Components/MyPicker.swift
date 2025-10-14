@@ -39,16 +39,17 @@ struct MyPicker<Entry: Hashable>: View {
                         .scaledToFit()
                         .frame(width: 14, height: 14)
                         .rotationEffect(.degrees(showMenu ? 180 : 0), anchor: .center)
+                        .animation(.easeInOut(duration: 0.3), value: showMenu)
                         .foregroundStyle(AppSettings.shared.theme.getAccentColor().opacity(isHovered ? 1.0 : 0.5))
+                        .animation(.easeInOut(duration: 0.2), value: isHovered)
                         .padding(.trailing, 5)
                 }
-                .animation(.easeInOut(duration: 0.3), value: showMenu)
                 
                 RoundedRectangle(cornerRadius: 4)
                     .stroke(AppSettings.shared.theme.getAccentColor().opacity(isHovered ? 1.0 : 0.5), lineWidth: 1.5)
                     .allowsHitTesting(false)
+                    .animation(.easeInOut(duration: 0.2), value: self.isHovered)
             }
-            .animation(.easeInOut(duration: 0.2), value: self.isHovered)
             .frame(height: 27)
             .contentShape(Rectangle())
             .onTapGesture {

@@ -50,6 +50,7 @@ struct MyComboBoxItemView<Option: Hashable>: View {
                 .font(.custom("PCL English", size: 14))
         }
         .foregroundStyle(isHovered ? AppSettings.shared.theme.getTextStyle() : AnyShapeStyle(Color("TextColor")))
+        .animation(.easeInOut(duration: 0.2), value: isHovered)
         .background(Color.clear)
         .contentShape(Rectangle())
         .onTapGesture {
@@ -65,7 +66,6 @@ struct MyComboBoxItemView<Option: Hashable>: View {
                 }
             }
         }
-        .animation(.easeInOut(duration: 0.2), value: isHovered)
         .onHover { isHovered in
             self.isHovered = isHovered
         }

@@ -29,13 +29,16 @@ struct MyButton: View {
         ZStack {
             RoundedRectangle(cornerRadius: 4)
                 .stroke(self.getForegroundStyle(), lineWidth: 1.3)
+                .animation(.easeInOut(duration: 0.2), value: isHovered)
             RoundedRectangle(cornerRadius: 6)
                 .foregroundStyle(isHovered ? AppSettings.shared.theme.getAccentColor().opacity(0.1) : .clear)
+                .animation(.easeInOut(duration: 0.2), value: isHovered)
             VStack {
                 Spacer()
                 Text(text)
                     .font(.custom("PCL English", size: 14))
                     .foregroundStyle(self.getForegroundStyle())
+                    .animation(.easeInOut(duration: 0.2), value: isHovered)
                     .padding(.leading)
                     .padding(.trailing)
                     .frame(maxWidth: .infinity)
@@ -63,7 +66,6 @@ struct MyButton: View {
                 }
         )
         .scaleEffect(isPressed ? 0.85 : 1.0)
-        .animation(.easeInOut(duration: 0.2), value: isHovered)
         .animation(.easeInOut(duration: 0.2), value: isPressed)
     }
 }
