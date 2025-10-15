@@ -119,17 +119,17 @@ public class MinecraftInstaller {
         assetIndex: AssetIndex,
         directory: MinecraftDirectory
     ) async throws {
-        var items: [DownloadItem] = []
+        var urls: [URL] = []
+        var destinations: [URL] = []
+        var sha1: [String] = []
         
         for object in assetIndex.objects {
-            items.append(.init(
-                object.appendTo(URL(string: "https://resources.download.minecraft.net")!),
-                object.appendTo(directory.assetsURL.appending(path: "objects")),
-                object.hash
-            ))
+            urls.append(object.appendTo(URL(string: "https://resources.download.minecraft.net")!))
+            destinations.append(object.appendTo(directory.assetsURL.appending(path: "objects")))
+            sha1.append(object.hash)
         }
         
-        try await MultiFileDownloader(task: task, items: items, concurrentLimit: 256).start()
+        try await ReusableMultiFileDownloader(task: task, urls: urls, destinations: destinations, sha1: sha1, maxConnections: 64).start()
     }
     
     /// 下载清单中的所有依赖项。

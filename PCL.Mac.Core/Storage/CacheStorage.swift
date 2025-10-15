@@ -53,7 +53,7 @@ public class CacheStorage {
         
         let hash: String
         do {
-            hash = try Util.sha1OfFile(url: path)
+            hash = try Util.getSHA1(url: path)
         } catch {
             err("无法获取 SHA-1: \(error.localizedDescription)")
             return
@@ -117,7 +117,7 @@ public class CacheStorage {
                 return
             }
             
-            let hash = try Util.sha1OfFile(url: localURL)
+            let hash = try Util.getSHA1(url: localURL)
             try FileManager.default.copyItem(at: localURL, to: getCachePath(hash))
             self.eTag.append(
                 ETag(

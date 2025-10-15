@@ -11,18 +11,23 @@ import Security
 
 public final class ReusableMultiFileDownloader: @unchecked Sendable {
     private let host: String
+    private let task: InstallTask?
     private let urls: [URL]
     private let destinations: [URL]
+    private let sha1: [String]
     private let maxConnections: Int
     private let parameters: NWParameters
     private let endpoint: NWEndpoint
+    private var totalProgress: Double = 0
     private var taskIndex: Int = 0
     private let indexQueue = DispatchQueue(label: "ReusableMultiFileDownloader.index")
     private let connectionQueue = DispatchQueue(label: "ReusableMultiFileDownloader.connection")
     
     public init(
+        task: InstallTask?,
         urls: [URL],
         destinations: [URL],
+        sha1: [String],
         maxConnections: Int
     ) {
         let hostSet: Set<String> = Set(urls.compactMap({ $0.host() }))
@@ -30,8 +35,10 @@ public final class ReusableMultiFileDownloader: @unchecked Sendable {
             preconditionFailure()
         }
         self.host = hostSet.first!
+        self.task = task
         self.urls = urls
         self.destinations = destinations
+        self.sha1 = sha1
         self.maxConnections = maxConnections
         
         let tlsOptions: NWProtocolTLS.Options = NWProtocolTLS.Options()
@@ -43,27 +50,48 @@ public final class ReusableMultiFileDownloader: @unchecked Sendable {
     
     /// 开始下载所有文件。
     public func start() async throws {
-        guard !urls.isEmpty, urls.count == destinations.count else { return }
+        // 检查参数是否合理
+        guard !urls.isEmpty, urls.count == destinations.count, urls.count == sha1.count else { return }
         let total = urls.count
         let group = DispatchGroup()
         (0..<total).forEach { _ in group.enter() }
         
-        @Sendable func nextTask() -> (URL, URL)? {
-            var pair: (URL, URL)? = nil
+        // 创建进度同步任务
+        var tickerTask: Task<Void, Error>? = nil
+        if let task = task {
+            tickerTask = Task {
+                while !Task.isCancelled {
+                    try? await Task.sleep(for: .seconds(0.1))
+                    if Task.isCancelled { break }
+                    await MainActor.run {
+                        task.currentStageProgress = self.totalProgress / Double(total)
+                    }
+                }
+            }
+        }
+        defer { tickerTask?.cancel() }
+        
+        @Sendable func nextTask() -> (URL, URL, String)? {
+            var pair: (URL, URL, String)? = nil
             indexQueue.sync {
                 guard taskIndex < total else { return }
                 let i = taskIndex
                 taskIndex += 1
-                pair = (urls[i], destinations[i])
+                pair = (urls[i], destinations[i], sha1[i])
             }
             return pair
         }
         
         @Sendable func schedule(on connection: NWConnection) {
-            if let (url, dest) = nextTask() {
-                startDownload(connection: connection, url: url, destination: dest) {
+            if let (url, dest, sha1) = nextTask() {
+                startDownload(connection: connection, url: url, destination: dest, sha1: sha1) {
                     group.leave()
-                    schedule(on: connection)
+                    DispatchQueue.main.async {
+                        self.task?.completeOneFile()
+                    }
+                    self.connectionQueue.async {
+                        schedule(on: connection)
+                    }
                 }
             } else {
                 connection.cancel()
@@ -97,7 +125,25 @@ public final class ReusableMultiFileDownloader: @unchecked Sendable {
         NWConnection(to: endpoint, using: parameters)
     }
     
-    private func startDownload(connection: NWConnection, url: URL, destination: URL, completion: @escaping () -> Void) {
+    private func startDownload(
+        connection: NWConnection,
+        url: URL,
+        destination: URL,
+        sha1: String,
+        completion: @escaping () -> Void
+    ) {
+        // 判断文件是否存在并校验 SHA-1
+        if FileManager.default.fileExists(atPath: destination.path) {
+            do {
+                if try Util.getSHA1(url: destination) == sha1 {
+                    completion()
+                    return
+                }
+            } catch {
+                err("无法计算 SHA-1: \(error.localizedDescription)")
+            }
+            try? FileManager.default.removeItem(at: destination)
+        }
         let request: String =
         "GET \(url) HTTP/1.1\r\n" +
         "Host: \(host)\r\n" +
@@ -119,6 +165,7 @@ public final class ReusableMultiFileDownloader: @unchecked Sendable {
     private func receiveData(from connection: NWConnection, to destination: URL, completion: @escaping () -> Void) {
         var buffer = Data()
         var headers: [String: String] = [:]
+        var contentLength: Int?
         var headersParsed = false
         let separator = "\r\n\r\n".data(using: .utf8)!
         
@@ -134,15 +181,20 @@ public final class ReusableMultiFileDownloader: @unchecked Sendable {
                     Task {
                         await SpeedMeter.shared.addBytes(data.count)
                     }
+                    var receivedByteCount: Int = data.count
                     if !headersParsed, let range = buffer.range(of: separator) {
                         let headerData = buffer.subdata(in: 0..<range.upperBound)
                         headers = self.parseHTTPHeaders(from: headerData)
+                        contentLength = Int(headers["Content-Length"] ?? "")
                         buffer.removeSubrange(0..<range.upperBound)
+                        receivedByteCount = buffer.count
                         headersParsed = true
                     }
-                    if headersParsed {
-                        let contentLengthString = headers["Content-Length"] ?? headers["content-length"]
-                        if let contentLengthString, let contentLength = Int(contentLengthString), buffer.count >= contentLength {
+                    if headersParsed, let contentLength = contentLength {
+                        DispatchQueue.main.async {
+                            self.totalProgress += Double(receivedByteCount) / Double(contentLength)
+                        }
+                        if buffer.count >= contentLength {
                             do {
                                 try? FileManager.default.createDirectory(at: destination.parent(), withIntermediateDirectories: true)
                                 let body = buffer.prefix(contentLength)

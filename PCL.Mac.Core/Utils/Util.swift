@@ -104,7 +104,7 @@ public class Util {
         }
     }
     
-    public static func sha1OfFile(url: URL) throws -> String {
+    public static func getSHA1(url: URL) throws -> String {
         let fileHandle = try FileHandle(forReadingFrom: url)
         defer { try? fileHandle.close() }
         

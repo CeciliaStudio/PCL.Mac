@@ -21,7 +21,7 @@ public class SingleFileDownloader {
         // 若文件已存在，且指定了在存在时跳过，或者缓存中有该文件，直接返回
         if FileManager.default.fileExists(atPath: destination.path) && replaceMethod == .skip
             || cacheStorage?.copyFile(url: url, to: destination) == true {
-            if try sha1 == nil || Util.sha1OfFile(url: destination) == sha1 {
+            if try sha1 == nil || Util.getSHA1(url: destination) == sha1 {
                 task?.completeOneFile()
                 progress?(1)
                 return
