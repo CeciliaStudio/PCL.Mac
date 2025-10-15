@@ -32,7 +32,7 @@ public final class ReusableMultiFileDownloader: @unchecked Sendable {
     ) {
         let hostSet: Set<String> = Set(urls.compactMap({ $0.host() }))
         if hostSet.count != 1 {
-            preconditionFailure()
+            preconditionFailure("所有 URL 必须来自同一个主机")
         }
         self.host = hostSet.first!
         self.task = task
@@ -145,7 +145,7 @@ public final class ReusableMultiFileDownloader: @unchecked Sendable {
             try? FileManager.default.removeItem(at: destination)
         }
         let request: String =
-        "GET \(url) HTTP/1.1\r\n" +
+        "GET \(url.path) HTTP/1.1\r\n" +
         "Host: \(host)\r\n" +
         "User-Agent: PCL-Mac/\(SharedConstants.shared.version)\r\n" +
         "Accept: */*\r\n" +
