@@ -77,7 +77,8 @@ public class MinecraftInstaller {
         try await SingleFileDownloader.download(
             task: task,
             url: url,
-            destination: instanceURL.appending(path: "\(instanceURL.lastPathComponent).jar")
+            destination: instanceURL.appending(path: "\(instanceURL.lastPathComponent).jar"),
+            sha1: manifest.clientDownload?.sha1
         )
     }
     
@@ -97,7 +98,7 @@ public class MinecraftInstaller {
     ) async throws -> AssetIndex {
         let url: URL = try DownloadSourceManager.shared.getAssetIndexURL(version, manifest).unwrap("无法获取 \(version.displayName) 的 assetIndex 下载 URL。")
         let destination: URL = directory.assetsURL.appending(path: "indexes").appending(path: "\(manifest.assetIndex!.id).json")
-        try await SingleFileDownloader.download(task: task, url: url, destination: destination)
+        try await SingleFileDownloader.download(task: task, url: url, destination: destination, sha1: manifest.assetIndex?.sha1)
         do {
             let data = try Data(contentsOf: destination)
             return try .parse(data)
@@ -118,15 +119,17 @@ public class MinecraftInstaller {
         assetIndex: AssetIndex,
         directory: MinecraftDirectory
     ) async throws {
-        var urls: [URL] = []
-        var destinations: [URL] = []
+        var items: [DownloadItem] = []
         
         for object in assetIndex.objects {
-            urls.append(object.appendTo(URL(string: "https://resources.download.minecraft.net")!))
-            destinations.append(object.appendTo(directory.assetsURL.appending(path: "objects")))
+            items.append(.init(
+                object.appendTo(URL(string: "https://resources.download.minecraft.net")!),
+                object.appendTo(directory.assetsURL.appending(path: "objects")),
+                object.hash
+            ))
         }
         
-        try await MultiFileDownloader(task: task, urls: urls, destinations: destinations, concurrentLimit: 256).start()
+        try await MultiFileDownloader(task: task, items: items, concurrentLimit: 256).start()
     }
     
     /// 下载清单中的所有依赖项。
@@ -151,7 +154,12 @@ public class MinecraftInstaller {
                 }
                 
                 libraryNames.append(library.name)
-                items.append(.init(DownloadSourceManager.shared.getDownloadSource(), { $0.getLibraryURL(library)! }, destination: dest))
+                items.append(.init(
+                    DownloadSourceManager.shared.getDownloadSource(),
+                    { $0.getLibraryURL(library)! },
+                    destination: dest,
+                    sha1: artifact.sha1
+                ))
             }
         }
         
@@ -185,7 +193,12 @@ public class MinecraftInstaller {
             }
             
             libraryNames.append(library.name)
-            items.append(.init(DownloadSourceManager.shared.getDownloadSource(), { $0.getLibraryURL(library)! }, destination: dest))
+            items.append(.init(
+                DownloadSourceManager.shared.getDownloadSource(),
+                { $0.getLibraryURL(library)! },
+                destination: dest,
+                sha1: artifact.sha1
+            ))
         }
         
         try await MultiFileDownloader(task: task, items: items).start()

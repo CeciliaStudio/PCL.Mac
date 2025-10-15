@@ -52,6 +52,8 @@ public struct ArtifactVersionMapper {
             }
             
             library.artifact?.path = Util.toPath(mavenCoordinate: library.name)
+            library.artifact?.sha1 = nil
+            library.artifact?.size = nil
         }
         
         // MARK: - 替换本地库版本
@@ -82,6 +84,8 @@ public struct ArtifactVersionMapper {
             }
             
             artifact.path = URL(string: artifact.url)!.path
+            artifact.sha1 = nil
+            artifact.size = nil
         }
     }
     

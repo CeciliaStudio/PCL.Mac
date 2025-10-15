@@ -13,6 +13,7 @@ public class SingleFileDownloader {
         task: InstallTask? = nil,
         url: URL,
         destination: URL,
+        sha1: String? = nil,
         replaceMethod: ReplaceMethod = .skip,
         cacheStorage: CacheStorage? = nil,
         progress: ((Double) -> Void)? = nil
@@ -20,15 +21,20 @@ public class SingleFileDownloader {
         // 若文件已存在，且指定了在存在时跳过，或者缓存中有该文件，直接返回
         if FileManager.default.fileExists(atPath: destination.path) && replaceMethod == .skip
             || cacheStorage?.copyFile(url: url, to: destination) == true {
-            task?.completeOneFile()
-            progress?(1)
-            return
+            if try sha1 == nil || Util.sha1OfFile(url: destination) == sha1 {
+                task?.completeOneFile()
+                progress?(1)
+                return
+            } else {
+                debug("SHA-1 不匹配: \(destination.lastPathComponent)")
+                try FileManager.default.removeItem(at: destination)
+            }
         }
         
         // 创建请求并设置 User-Agent
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.setValue("PCL.Mac/\(SharedConstants.shared.version)", forHTTPHeaderField: "User-Agent")
+        request.setValue("PCL-Mac/\(SharedConstants.shared.version)", forHTTPHeaderField: "User-Agent")
         
         // 发送请求
         let (byteStream, response) = try await URLSession.shared.bytes(for: request)

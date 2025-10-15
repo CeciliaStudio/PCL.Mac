@@ -52,8 +52,8 @@ public class ClientManifest {
 
     public class DownloadInfo {
         public var path: String
-        public let sha1: String?
-        public let size: Int?
+        public var sha1: String?
+        public var size: Int?
         public var url: String
         
         public init(json: JSON) {
