@@ -8,6 +8,7 @@
 import Foundation
 import PCL_Mac
 import Testing
+import SwiftyJSON
 
 struct DownloaderTests {
     @Test func testSingleFileDownload() async throws {
@@ -31,5 +32,13 @@ struct DownloaderTests {
         }
         
         try await downloader.start()
+    }
+    
+    @Test func testReusableMultiFileDownload() async throws {
+        let data = try FileHandle(forReadingFrom: URL(fileURLWithUserPath: "~/minecraft/assets/indexes/27.json")).readToEnd()!
+        let assetIndex = AssetIndex(try JSON(data: data))
+        let urls = assetIndex.objects.map { $0.appendTo(URL(string: "https://resources.download.minecraft.net")!) }
+        let destinations = assetIndex.objects.map { $0.appendTo(URL(filePath: "/tmp")) }
+        try await ReusableMultiFileDownloader(urls: urls, destinations: destinations, maxConnections: 64).start()
     }
 }
