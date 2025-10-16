@@ -39,7 +39,7 @@ extension Announcement {
                     }
                 default:
                     warn("不支持的元素: \(element.name)")
-                    contentList.append(.text(.init(content: "你的启动器版本过低，不支持 \(element.name) 元素的显示。")))
+                    contentList.append(.text(.init(content: "你的启动器版本过低，不支持 \(element.name) 元素的显示。", size: 14)))
                 }
             }
         }
@@ -56,7 +56,8 @@ extension Announcement {
 extension Announcement.Text {
     static func parse(from xml: XMLIndexer) -> Announcement.Text? {
         guard let text = xml.element?.text else { return nil }
-        return Announcement.Text.init(content: text)
+        
+        return Announcement.Text(content: text, size: CGFloat(Float(xml.element?.attribute(by: "size")?.text ?? "") ?? 14))
     }
 }
 

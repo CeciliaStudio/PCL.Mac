@@ -31,6 +31,7 @@ public struct Announcement {
     public struct Text: Identifiable {
         public let id: UUID = UUID()
         public let content: String
+        public let size: CGFloat
     }
     
     public struct Link: Identifiable {
