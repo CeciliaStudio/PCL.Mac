@@ -9,7 +9,7 @@ import SwiftUI
 
 extension Announcement {
     @ViewBuilder
-    func makeView() -> some View {
+    func makeContentView() -> some View {
         ForEach(content) { (content: Announcement.Content) in
             switch content {
             case .text(let text):

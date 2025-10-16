@@ -122,6 +122,7 @@ struct AboutView: View {
                     DependencyView(name: "ZIPFoundation", license: "MIT License", repo: "weichsel/ZIPFoundation")
                     DependencyView(name: "PCL.Mac.Daemon", description: "自动导出启动器崩溃报告的守护进程", license: "MIT License", repo: "CeciliaStudio/PCL.Mac.Daemon")
                     DependencyView(name: "TOMLKit", license: "MIT License", repo: "LebJe/TOMLKit")
+                    DependencyView(name: "SWXMLHash", license: "MIT License", repo: "drmohundro/SWXMLHash")
                 }
             }
             .padding()
