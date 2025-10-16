@@ -10,6 +10,7 @@
 		EC01E7E82DDC3BEA006EF529 /* log4j2.xml in Resources */ = {isa = PBXBuildFile; fileRef = EC01E7E62DDC3BEA006EF529 /* log4j2.xml */; };
 		EC01E7E92DDC3BEA006EF529 /* log4j2-1.12-.xml in Resources */ = {isa = PBXBuildFile; fileRef = EC01E7E72DDC3BEA006EF529 /* log4j2-1.12-.xml */; };
 		EC23B6332DE5DC5B00CBEA9C /* PCL.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EC23B6322DE5DC5B00CBEA9C /* PCL.ttf */; };
+		EC2B20C12EA0D949006F1495 /* SWXMLHash in Frameworks */ = {isa = PBXBuildFile; productRef = EC2B20C02EA0D949006F1495 /* SWXMLHash */; };
 		EC3C3C4F2E2134A90033107E /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = EC3C3C4E2E2134A90033107E /* SwiftyJSON */; };
 		EC422DAB2E2082D900FE8309 /* PCL_Mac_Core.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC422DA32E2082D900FE8309 /* PCL_Mac_Core.framework */; };
 		EC422DAD2E2082D900FE8309 /* PCL_Mac_Core.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EC422DA32E2082D900FE8309 /* PCL_Mac_Core.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -69,6 +70,8 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Announcement/AnnouncementManager.swift,
+				Announcement/AnnouncementModel.swift,
+				Announcement/AnnouncementParser.swift,
 				Architecture.swift,
 				Download/MultiFileDownloader.swift,
 				Download/ReusableMultiFileDownloader.swift,
@@ -127,6 +130,8 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Announcement/AnnouncementManager.swift,
+				Announcement/AnnouncementModel.swift,
+				Announcement/AnnouncementParser.swift,
 				Architecture.swift,
 				Download/MultiFileDownloader.swift,
 				Download/ReusableMultiFileDownloader.swift,
@@ -249,6 +254,7 @@
 			files = (
 				EC422DAB2E2082D900FE8309 /* PCL_Mac_Core.framework in Frameworks */,
 				EC9507372DFCF17700018EE0 /* SwiftyJSON in Frameworks */,
+				EC2B20C12EA0D949006F1495 /* SWXMLHash in Frameworks */,
 				ECDBF0CC2E1124C500E81482 /* ZIPFoundation in Frameworks */,
 				ECFF69BD2E542EE8000625FA /* TOMLKit in Frameworks */,
 			);
@@ -368,6 +374,7 @@
 				EC9507362DFCF17700018EE0 /* SwiftyJSON */,
 				ECDBF0CB2E1124C500E81482 /* ZIPFoundation */,
 				ECFF69BC2E542EE8000625FA /* TOMLKit */,
+				EC2B20C02EA0D949006F1495 /* SWXMLHash */,
 			);
 			productName = "PCL-Mac";
 			productReference = EC9EAEC92DD85E48006CEDCC /* PCL.Mac.app */;
@@ -436,6 +443,7 @@
 				EC9507352DFCF17700018EE0 /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
 				ECDBF0CA2E1124C500E81482 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
 				ECFF69BB2E542EE8000625FA /* XCRemoteSwiftPackageReference "TOMLKit" */,
+				EC2B20BF2EA0D949006F1495 /* XCRemoteSwiftPackageReference "SWXMLHash" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = EC9EAECA2DD85E48006CEDCC /* Products */;
@@ -855,6 +863,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		EC2B20BF2EA0D949006F1495 /* XCRemoteSwiftPackageReference "SWXMLHash" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/drmohundro/SWXMLHash";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.1.1;
+			};
+		};
 		EC9507352DFCF17700018EE0 /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SwiftyJSON/SwiftyJSON";
@@ -882,6 +898,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		EC2B20C02EA0D949006F1495 /* SWXMLHash */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EC2B20BF2EA0D949006F1495 /* XCRemoteSwiftPackageReference "SWXMLHash" */;
+			productName = SWXMLHash;
+		};
 		EC3C3C4E2E2134A90033107E /* SwiftyJSON */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = EC9507352DFCF17700018EE0 /* XCRemoteSwiftPackageReference "SwiftyJSON" */;

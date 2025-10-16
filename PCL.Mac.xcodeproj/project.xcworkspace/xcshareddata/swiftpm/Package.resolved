@@ -1,5 +1,5 @@
 {
-  "originHash" : "286917055d00cbbe3d26ad0580d8852d8928a8d94652c8da5066a7136c230af9",
+  "originHash" : "9d2419cbbeb09e975881df91137ec159c0ea6b52a7989c728137690ceaea38dc",
   "pins" : [
     {
       "identity" : "swiftyjson",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "af76cf3ef710b6ca5f8c05f3a31307d44a3c5828",
         "version" : "5.0.2"
+      }
+    },
+    {
+      "identity" : "swxmlhash",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/drmohundro/SWXMLHash",
+      "state" : {
+        "revision" : "9cfb8730651ae7f57a6f5d413e2f07be7d7dbd41",
+        "version" : "8.1.1"
       }
     },
     {

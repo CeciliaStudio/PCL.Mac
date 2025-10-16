@@ -39,6 +39,6 @@ struct DownloaderTests {
         let assetIndex = AssetIndex(try JSON(data: data))
         let urls = assetIndex.objects.map { $0.appendTo(URL(string: "https://resources.download.minecraft.net")!) }
         let destinations = assetIndex.objects.map { $0.appendTo(URL(filePath: "/tmp")) }
-        try await ReusableMultiFileDownloader(urls: urls, destinations: destinations, sha1: assetIndex.objects.map { $0.hash }, maxConnections: 64).start()
+        try await ReusableMultiFileDownloader(task: nil, urls: urls, destinations: destinations, sha1: assetIndex.objects.map { $0.hash }, maxConnections: 64).start()
     }
 }

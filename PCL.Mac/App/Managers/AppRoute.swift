@@ -21,7 +21,6 @@ public enum AppRoute: Hashable {
     case installing(tasks: InstallTasks)
     case instanceSelect
     case projectDownload(summary: ProjectSummary)
-    case announcementHistory
     case instanceSettings(instance: MinecraftInstance)
     case directoryConfig(directory: MinecraftDirectory)
     case minecraftInstall(version: MinecraftVersion)
@@ -74,7 +73,6 @@ public enum AppRoute: Hashable {
         case .instanceSelect, .instanceList: "实例选择"
         case .projectDownload(let summary): "资源下载 - \(summary.name)"
         case .accountManagement, .accountList, .newAccount: "账号管理"
-        case .announcementHistory: "历史公告"
         case .instanceSettings, .instanceOverview, .instanceConfig, .instanceMods: "实例设置 - \(MinecraftDirectoryManager.shared.current.config.defaultInstance ?? "")"
         case .javaDownload: "Java 下载"
         case .themeUnlock: "主题解锁"
@@ -131,8 +129,6 @@ public class AppRouter: ObservableObject {
             InstanceSelectView()
         case .projectDownload(let summary):
             ProjectDownloadView(id: summary.modId)
-        case .announcementHistory:
-            AnnouncementHistoryView()
         case .instanceSettings, .instanceOverview, .instanceConfig, .instanceMods:
             InstanceSettingsView()
         case .javaDownload:
