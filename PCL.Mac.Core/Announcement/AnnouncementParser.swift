@@ -39,6 +39,7 @@ extension Announcement {
                     }
                 default:
                     warn("不支持的元素: \(element.name)")
+                    contentList.append(.text(.init(content: "你的启动器版本过低，不支持 \(element.name) 元素的显示。")))
                 }
             }
         }
