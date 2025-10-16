@@ -284,7 +284,7 @@ struct LaunchView: View {
                 MyCard(title: "\(announcement.isImportant ? "重要公告" : "公告") | \(announcement.title)") {
                     VStack(alignment: .leading, spacing: 12) {
                         announcement.makeContentView()
-                        Text("——\(announcement.author)，\(DateFormatters.shared.displayDateFormatter.string(from: announcement.time))")
+                        Text("—— \(announcement.author)，\(DateFormatters.shared.displayDateFormatter.string(from: announcement.time))")
                             .font(.custom("PCL English", size: 14))
                             .foregroundStyle(Color(hex: 0x7F8790))
                             .frame(maxWidth: .infinity, alignment: .trailing)
