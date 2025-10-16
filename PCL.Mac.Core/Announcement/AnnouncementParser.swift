@@ -71,7 +71,7 @@ extension Announcement.Link {
 extension Announcement.Tip {
     static func parse(from xml: XMLIndexer) -> Announcement.Tip? {
         guard let colorRaw = xml.element?.attribute(by: "color")?.text,
-              let color = Announcement.Tip.TipColor(rawValue: colorRaw)
+              let color = TipColor(rawValue: colorRaw)
         else { return nil }
         let text: String = xml.element?.text ?? ""
         return Announcement.Tip(text: text, color: color)

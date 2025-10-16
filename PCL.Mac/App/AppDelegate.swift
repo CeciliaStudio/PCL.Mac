@@ -140,38 +140,36 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window = Window(contentView: hostingView)
         window.makeKeyAndOrderFront(nil)
         
-        if AppSettings.shared.showPCLMacPopup {
-            Task {
+        Task {
+            await AnnouncementManager.shared.fetchAnnouncement()
+            if AppSettings.shared.showPCLMacPopup {
                 if await PopupManager.shared.showAsync(
                     .init(.normal, "欢迎使用 PCL.Mac！", "本启动器是 Plain Craft Launcher（作者：龙腾猫跃）的非官方衍生版。\n若要反馈问题，请在 GitHub 上开 Issue。", [.init(label: "永久关闭", style: .normal), .close])
                 ) == 0 {
                     AppSettings.shared.showPCLMacPopup = false
                 }
             }
-        } else { // 确保不会两个 Popup 叠加
-            Task {
-                let list = try await UpdateChecker.fetchVersions()
-                if !UpdateChecker.isLauncherUpToDate(list: list) {
-                    let latest = list.getLatestVersion()!
-                    let changelogURL = URL(string: "https://gitee.com/yizhimcqiu/PCL.Mac.Releases/blob/main/changelog/\(latest.tag).md")!
-                    await MainActor.run {
-                        PopupManager.shared.show(
-                            .init(.normal, "PCL.Mac 有更新可用", "发现新版本 \(latest.name)\n发布时间：\(DateFormatters.shared.displayDateFormatter.string(from: latest.time))\n更新日志：\(changelogURL.absoluteString)",
-                                  [.init(label: "打开更新日志", style: .normal, closeOnClick: false), .init(label: "跳过", style: .normal), .init(label: "更新", style: .accent)]),
-                            callback: { id in
-                                if id == 0 {
-                                    NSWorkspace.shared.open(changelogURL)
-                                } else if id == 1 {
-                                    AppSettings.shared.launcherVersionId = latest.id
-                                } else if id == 2 {
-                                    Task {
-                                        try await UpdateChecker.update(to: list.getLatestVersion())
-                                    }
-                                    hint("开始下载更新，下载完成后将自动重启……")
-                                    AppSettings.shared.launcherVersionId = latest.id
+            let list = try await UpdateChecker.fetchVersions()
+            if !UpdateChecker.isLauncherUpToDate(list: list) {
+                let latest = list.getLatestVersion()!
+                let changelogURL = URL(string: "https://gitee.com/yizhimcqiu/PCL.Mac.Releases/blob/main/changelog/\(latest.tag).md")!
+                await MainActor.run {
+                    PopupManager.shared.show(
+                        .init(.normal, "PCL.Mac 有更新可用", "发现新版本 \(latest.name)\n发布时间：\(DateFormatters.shared.displayDateFormatter.string(from: latest.time))\n更新日志：\(changelogURL.absoluteString)",
+                              [.init(label: "打开更新日志", style: .normal, closeOnClick: false), .init(label: "跳过", style: .normal), .init(label: "更新", style: .accent)]),
+                        callback: { id in
+                            if id == 0 {
+                                NSWorkspace.shared.open(changelogURL)
+                            } else if id == 1 {
+                                AppSettings.shared.launcherVersionId = latest.id
+                            } else if id == 2 {
+                                Task {
+                                    try await UpdateChecker.update(to: list.getLatestVersion())
                                 }
-                            })
-                    }
+                                hint("开始下载更新，下载完成后将自动重启……")
+                                AppSettings.shared.launcherVersionId = latest.id
+                            }
+                        })
                 }
             }
         }

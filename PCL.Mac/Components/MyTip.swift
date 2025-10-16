@@ -28,7 +28,7 @@ struct MyTip: View {
     }
 }
 
-enum TipColor {
+public enum TipColor: String {
     case blue, red, yellow
     
     private var hue: Double {

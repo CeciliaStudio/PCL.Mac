@@ -14,26 +14,34 @@ public struct Announcement {
     public let time: Date
     public let content: [Content]
     
-    public enum Content {
+    public enum Content: Identifiable {
+        public var id: UUID {
+            switch self {
+            case .text(let text): text.id
+            case .link(let link): link.id
+            case .tip(let tip): tip.id
+            }
+        }
+        
         case text(Text)
         case link(Link)
         case tip(Tip)
     }
     
-    public struct Text {
+    public struct Text: Identifiable {
+        public let id: UUID = UUID()
         public let content: String
     }
     
-    public struct Link {
+    public struct Link: Identifiable {
+        public let id: UUID = UUID()
         public let url: URL
         public let display: String
     }
     
-    public struct Tip {
+    public struct Tip: Identifiable {
+        public let id: UUID = UUID()
         public let text: String
         public let color: TipColor
-        public enum TipColor: String {
-            case blue, red, yellow
-        }
     }
 }

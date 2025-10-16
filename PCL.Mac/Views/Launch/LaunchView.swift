@@ -276,14 +276,20 @@ fileprivate struct LeftTab: View {
 
 struct LaunchView: View {
     @ObservedObject private var dataManager: DataManager = .shared
-//    @ObservedObject private var announcementManager: AnnouncementManager = .shared
+    @ObservedObject private var announcementManager: AnnouncementManager = .shared
     
     var body: some View {
         ScrollView {
-//            if let announcement = announcementManager.latest {
-//                announcement.createView(showHistoryButton: true)
-//                    .padding()
-//            }
+            if let announcement = announcementManager.lastAnnouncement {
+                MyCard(title: "\(announcement.isImportant ? "重要公告" : "公告") | \(announcement.title)") {
+                    VStack(alignment: .leading) {
+                        announcement.makeView()
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+                }
+                .padding()
+            }
             
             if SharedConstants.shared.isDevelopment {
                 StaticMyCard(index: 1, title: "警告") {
