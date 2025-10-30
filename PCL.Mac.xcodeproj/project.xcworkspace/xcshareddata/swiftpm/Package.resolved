@@ -1,6 +1,15 @@
 {
-  "originHash" : "9d2419cbbeb09e975881df91137ec159c0ea6b52a7989c728137690ceaea38dc",
+  "originHash" : "5299bf20da1e99f27252d0f65dbd2510340b85bf9bb849384738c60307cee2a7",
   "pins" : [
+    {
+      "identity" : "swiftscaffolding",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/CeciliaStudio/SwiftScaffolding",
+      "state" : {
+        "branch" : "main",
+        "revision" : "303364062b844f24d01f83145f17b91ad315bbf2"
+      }
+    },
     {
       "identity" : "swiftyjson",
       "kind" : "remoteSourceControl",
