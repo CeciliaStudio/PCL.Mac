@@ -222,17 +222,22 @@ public class ForgeInstaller {
             }
         } else {
             guard let installProfile else {
-                throw MyLocalizedError(reason: "installProfile 为空")
+                return
             }
             libraries.append(contentsOf: installProfile.libraries)
         }
-        
-        libraries = libraries.filter { $0.artifact != nil && $0.artifact!.url != "" }
-        let artifacts = libraries.compactMap { $0.artifact }
-        
+        let items: [DownloadItem] = libraries.compactMap { library in
+            guard let artifact = library.artifact, artifact.url != "" else {
+                return nil
+            }
+            return .init(
+                DownloadSourceManager.shared.getDownloadSource(),
+                { $0.getLibraryURL(library)! },
+                destination: minecraftDirectory.librariesURL.appending(path: artifact.path)
+            )
+        }
         let downloader = MultiFileDownloader(
-            urls: libraries.compactMap(DownloadSourceManager.shared.getLibraryURL(_:)),
-            destinations: artifacts.map { minecraftDirectory.librariesURL.appending(path: $0.path) },
+            items: items,
             replaceMethod: .skip
         ) { progress, _ in
             Task { @MainActor in
