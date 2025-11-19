@@ -154,7 +154,6 @@ private class ModpackInstallTask: InstallTask {
             let dest = instanceURL.appending(path: relative)
             try? FileManager.default.createDirectory(at: dest.parent(), withIntermediateDirectories: true)
             try FileManager.default.copyItem(at: url, to: dest)
-            log("\(relative) 拷贝完成")
             increaseProgress(step)
         }
         await MainActor.run {

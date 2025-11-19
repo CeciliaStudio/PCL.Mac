@@ -101,8 +101,8 @@ public class ForgeInstaller {
         let process = Process()
         process.currentDirectoryURL = temp.root
         process.executableURL = URL(fileURLWithPath: "/usr/bin/java")
+        process.standardOutput = nil
         process.arguments = [
-            // processor 初始化逻辑中往 classpath 里添加了它本身的 jar，这里直接 map
             "-cp", processor.classpath.map { minecraftDirectory.librariesURL.appending(path: $0).path }.joined(separator: ":"),
             mainClass
         ]
@@ -111,26 +111,21 @@ public class ForgeInstaller {
         process.waitUntilExit()
     }
     
-    // MARK: - 修改 DOWNLOAD_MOJMAPS 任务
-    private func patchMojangMappingsDownloadTask(_ processor: ForgeInstallProfile.Processor) async throws -> Bool {
+    private func downloadMojmaps(_ processor: ForgeInstallProfile.Processor) async throws -> Bool {
         // 若参数中不存在 --output，或 --output 后没有参数，返回
         guard let index = processor.args.firstIndex(of: "--output"),
               index + 1 < processor.args.count else {
             return false
         }
         
-        // 若实例的 client_mappings 下载项不存在，跳过
         guard let clientMappingsDownload = manifest.clientMappingsDownload else {
             return false
         }
-        
-        // 下载 mappings
         let url = clientMappingsDownload.url
         let destination = URL(fileURLWithPath: replaceWithValue(processor.args[index + 1]))
         
         try? FileManager.default.createDirectory(at: destination.parent(), withIntermediateDirectories: true)
         try await SingleFileDownloader.download(url: url.url, destination: destination, replaceMethod: .replace)
-        debug("已修改 DOWNLOAD_MOJMAPS 任务")
         
         return true
     }
@@ -146,12 +141,14 @@ public class ForgeInstaller {
         
         for processor in processors {
             if processor.args.contains("DOWNLOAD_MOJMAPS") {
-                if try await patchMojangMappingsDownloadTask(processor) {
+                if try await downloadMojmaps(processor) {
                     continue
                 }
             }
             if let index = processor.args.firstIndex(of: "--task") {
                 log("正在执行安装器 \(processor.args[index + 1])")
+            } else {
+                log("正在执行安装器 \(processor.jarPath)")
             }
             try executeProcessor(processor)
             await increaseProgress(step)
@@ -166,7 +163,7 @@ public class ForgeInstaller {
         if !CacheStorage.default.copyLibrary(name: name, to: installerPath) {
             let url = getInstallerDownloadURL(minecraftVersion, version)
             let dest = temp.getURL(path: "installer.jar")
-            log("正在下载安装器 \(url.lastPathComponent)")
+            log("正在下载安装器")
             try await SingleFileDownloader.download(url: url, destination: dest) { progress in
                 Task { @MainActor in self.setProgress(progress * 0.2) }
             }
@@ -230,6 +227,7 @@ public class ForgeInstaller {
             libraries.append(contentsOf: installProfile.libraries)
         }
         
+        libraries = libraries.filter { $0.artifact != nil && $0.artifact!.url != "" }
         let artifacts = libraries.compactMap { $0.artifact }
         
         let downloader = MultiFileDownloader(
@@ -245,12 +243,24 @@ public class ForgeInstaller {
         try await downloader.start()
     }
     
+    private func copyLibraries() throws {
+        let archive = try Archive(url: temp.getURL(path: "installer.jar"), accessMode: .read)
+        for entry in archive {
+            guard entry.path.hasPrefix("maven/") && entry.path.hasSuffix(".jar") else { continue }
+            let destination: URL = minecraftDirectory.librariesURL.appending(path: entry.path.dropFirst(6))
+            if FileManager.default.fileExists(atPath: destination.path) { continue }
+            try FileManager.default.createDirectory(at: destination.parent(), withIntermediateDirectories: true)
+            _ = try archive.extract(entry, to: destination)
+        }
+    }
+    
     // MARK: - 安装函数
     public func install(minecraftVersion: MinecraftVersion, forgeVersion: String) async throws {
         try await downloadInstaller(minecraftVersion: minecraftVersion, version: forgeVersion)
         try await copyManifest(version: minecraftVersion)
         try await parseValues()
         try await downloadDependencies()
+        try copyLibraries()
         
         if !isOld {
             try await executeProcessors()

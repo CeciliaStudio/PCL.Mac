@@ -22,10 +22,10 @@ public struct ForgeInstallProfile {
     public struct Processor {
         public let isAvailableOnClient: Bool
         
-        /// 已解析过的 processor jar 文件，不是 Maven 坐标
+        /// processor jar 文件的相对路径
         public let jarPath: String
         
-        /// 已解析过的类路径，不是 Maven 坐标
+        /// 类路径
         public let classpath: [String]
         
         /// 参数列表

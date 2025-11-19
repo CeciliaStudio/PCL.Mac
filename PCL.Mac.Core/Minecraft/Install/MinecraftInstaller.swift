@@ -147,7 +147,7 @@ public class MinecraftInstaller {
         var items: [DownloadItem] = []
         
         for library in manifest.getNeededLibraries() {
-            if let artifact = library.artifact {
+            if let artifact = library.artifact, !artifact.url.isEmpty {
                 let dest = directory.librariesURL.appending(path: artifact.path)
                 if CacheStorage.default.copyLibrary(name: library.name, to: dest) {
                     continue
