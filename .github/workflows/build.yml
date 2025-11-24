@@ -26,13 +26,13 @@ jobs:
     
       - name: Replace secrets
         run: |
-            sed -i '' "s/{{ARTIFACT_PAT}}/$ARTIFACT_PAT/g" PCL.Mac/Secrets.swift
             sed -i '' "s/{{CLIENT_ID}}/$CLIENT_ID/g" PCL.Mac/Secrets.swift
             sed -i '' "s/{{THEME_KEY}}/$THEME_KEY/g" PCL.Mac/Secrets.swift
+            sed -i '' "s/{{API_ROOT}}/$API_ROOT/g" PCL.Mac/Secrets.swift
         env:
-          ARTIFACT_PAT: ${{ secrets.ARTIFACT_PAT }}
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
           THEME_KEY: ${{ secrets.THEME_KEY }}
+          API_ROOT: ${{ secrets.API_ROOT }}
 
       - name: Build Universal Binary
         run: |
