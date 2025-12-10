@@ -35,18 +35,3 @@ PCL.Mac 是使用 SwiftUI 框架重构的 [Plain Craft Launcher](https://github.
 
 ## 协议声明
 `PCL.Mac.Core` 使用 MIT License，使用其代码时请遵循 MIT License 的规定，保留原有的版权声明和许可条款。
-
-## 鸣谢
-
-本项目实现参考了 HMCL 等 Minecraft 启动器的实现流程。
-
-- FUNCTY
-- [AMagicPear](https://github.com/AMagicPear)
-- [Glavo](https://github.com/Glavo)
-- [HMCL-Dev](https://github.com/HMCL-Dev)
-- [Copilot](https://github.com/copilot)
-- [aria2](https://github.com/aria2/aria2)
-- 阿鱼 | 🐟🐟🐟
-- [MinecraftYJQ](https://github.com/MinecraftYJQ)
-- [xphost008](https://github.com/xphost008)
-- [SurpriseCandyShark](https://github.com/SupriseCandyShark)
