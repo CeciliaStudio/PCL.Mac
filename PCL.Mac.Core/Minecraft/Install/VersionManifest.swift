@@ -93,6 +93,7 @@ public class VersionManifest {
         && id.wholeMatch(of: /[0-9]{2}w[0-9]{2}.{1}/) == nil // 且不是标准快照格式 (如 23w33a)
         && id.rangeOfCharacter(from: .letters) != nil // 至少有一个字母 (筛掉 1.x 与 1.x.x)
         && !id.contains("-pre") && !id.contains("-rc") // 不是 Pre Release 或 Release Candidate
+        && !id.contains("snapshot") // 不是新版本号格式的快照（如 26.1-snapshot-1）
     }
     
     public static func getAprilFoolDescription(_ name: String) -> String {
