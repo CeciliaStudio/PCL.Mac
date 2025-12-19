@@ -12,6 +12,7 @@ public enum JavaCheckError: Error {
     case javaNotFound
     case noUsableJava(minVersion: Int)
     case javaUnusable(minVersion: Int)
+    case javaVersionTooHigh(recommended: Int)
     case javaNotSupport
     case invalidMemoryConfiguration
     case rosetta
@@ -58,6 +59,11 @@ public class LaunchPrecheck {
         } else if Architecture.system == .arm64 && java.architecture == .x64 {
             warn("[launchPrecheck] 正在使用 x64 Java")
             return .failure(.rosetta)
+        }
+        
+        if (instance.clientBrand == .forge || instance.clientBrand == .neoforge) && java.version > minVersion {
+            warn("[launchPrecheck] Java 版本过高")
+            return .failure(.javaVersionTooHigh(recommended: minVersion))
         }
         
         return .success(())

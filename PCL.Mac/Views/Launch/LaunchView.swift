@@ -255,10 +255,15 @@ fileprivate struct LeftTab: View {
                 }
                 return false
             case .invalidMemoryConfiguration:
-                PopupManager.shared.show(.init(.error, "错误", "无效的内存配置：0MB。\n请在 实例设置 > 设置 中调整游戏内存配置", [.ok]))
+                PopupManager.shared.show(.init(.error, "错误", "无效的内存配置：0 MB。\n请在 实例设置 > 设置 中调整游戏内存配置", [.ok]))
             case .rosetta:
                 if await PopupManager.shared.showAsync(.init(.normal, "警告", "你安装 / 选择了一个 x64 架构的 Java，需要通过转译运行，这将会损耗大部分性能。\n你可以进入 设置 > Java 管理，安装 / 选择一个 ARM64 架构的 Java。", [.init(label: "继续启动", style: .normal), .close]))
                 == 1 {
+                    return false
+                }
+            case .javaVersionTooHigh(let recommended):
+                if await PopupManager.shared.showAsync(.init(.error, "错误", "部分模组可能不支持高版本 Java，建议切换到 Java \(recommended)。", [.init(label: "Java 管理", style: .normal), .init(label: "忽略", style: .normal)])) == 0 {
+                    dataManager.router.path = [.settings, .javaSettings]
                     return false
                 }
             }
