@@ -126,9 +126,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         let swiftUIView = ContentView()
         let hostingView = NSHostingView(rootView: swiftUIView)
-        hostingView.wantsLayer = true
-        hostingView.layer?.cornerRadius = isMacOS26 ? 25 : 10
-        hostingView.layer?.masksToBounds = true
         window = Window(contentView: hostingView)
         window.makeKeyAndOrderFront(nil)
         
