@@ -11,15 +11,25 @@ import SwiftyJSON
 public class PlayerProfile: Codable {
     public let uuid: UUID
     public let name: String
+    public let properties: [String: String]
     
-    public init(fromResponse data: Data) {
-        let json = try! JSON(data: data)
+    public init(json: JSON) {
         self.uuid = UUID(uuidString: json["id"].stringValue.replacingOccurrences(
             of: "(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})",
             with: "$1-$2-$3-$4-$5",
             options: .regularExpression
         ))!
         self.name = json["name"].stringValue
+        self.properties = json["properties"].arrayValue.reduce(into: [String: String]()) { result, property in
+            result[property["name"].stringValue] = property["value"].stringValue
+        }
+    }
+    
+    public required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        uuid = try container.decode(UUID.self, forKey: .uuid)
+        name = try container.decode(String.self, forKey: .name)
+        properties = try container.decodeIfPresent([String: String].self, forKey: .properties) ?? [:]
     }
 }
 
@@ -67,13 +77,13 @@ public class MicrosoftAccount: Account {
             return nil
         }
         
-        if let data = await Requests.get(
+        if let json = await Requests.get(
             URL(string: "https://api.minecraftservices.com/minecraft/profile")!,
             headers: [
                 "Authorization": "Bearer \(accessToken)"
             ]
-        ).data {
-            return .init(refreshToken: authToken.refreshToken, profile: .init(fromResponse: data))
+        ).json {
+            return .init(refreshToken: authToken.refreshToken, profile: .init(json: json))
         }
         return nil
     }

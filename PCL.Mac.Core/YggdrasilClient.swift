@@ -43,11 +43,11 @@ public class YggdrasilClient {
     // MARK: - 角色属性查询
     /// https://github.com/yushijinhun/authlib-injector/wiki/Yggdrasil-服务端技术规范#查询角色属性
     /// GET /sessionserver/session/minecraft/profile/{uuid}
-    public func getProfile(id: UUID) async throws -> Profile {
+    public func getProfile(id: UUID) async throws -> PlayerProfile {
         return try await getProfile(id: id.uuidString.replacingOccurrences(of: "-", with: "").lowercased())
     }
     
-    public func getProfile(id: String) async throws -> Profile {
+    public func getProfile(id: String) async throws -> PlayerProfile {
         let json = try await Requests.get(serverURL.appending(path: "/sessionserver/session/minecraft/profile/\(id)")).getJSONOrThrow()
         return .init(json: json)
     }
@@ -63,23 +63,6 @@ public class YggdrasilClient {
             self.clientToken = json["clientToken"].stringValue
             self.profileName = json["selectedProfile"]["name"].stringValue
             self.profileUUID = parseUUID(json["selectedProfile"]["id"].stringValue)
-        }
-    }
-    
-    /// 角色模型
-    public struct Profile {
-        public let uuid: UUID
-        public let name: String
-        public let properties: [String : String]
-        
-        init(json: JSON) {
-            self.uuid = parseUUID(json["id"].stringValue)
-            self.name = json["name"].stringValue
-            var properties: [String : String] = [:]
-            for property in json["properties"].arrayValue {
-                properties[property["name"].stringValue] = property["value"].stringValue
-            }
-            self.properties = properties
         }
     }
     
