@@ -74,8 +74,8 @@ struct TitleBarView: View {
                     MyTag(label: "Mac", backgroundColor: .white)
                         .foregroundStyle(AppSettings.shared.theme.getTextStyle())
                     if Metadata.isDevelopment {
-                        MyTag(label: "Dev", backgroundColor: .blue)
-                            .foregroundStyle(Color("TextColor"))
+                        MyTag(label: "Dev", backgroundColor: Color(hex: 0x9BF00B))
+                            .foregroundStyle(Color(hex: 0x343D4A))
                     }
                 }
                 Spacer()
