@@ -13,8 +13,8 @@
 ## 简介
 
 > [!WARNING]
-> 当前不接受功能请求，只接受错误反馈，详细信息见 [Bilibili](https://www.bilibili.com/opus/1142054399874433058)。<br>
-> 我们正在彻底重写 PCL.Mac，请查看新项目 [CeciliaStudio/PCL.Mac.Refactor](https://github.com/CeciliaStudio/PCL.Mac.Refactor)。
+> 我们正在重写 PCL.Mac，当前仓库的最终版已发布，因此不再接受任何功能请求或非严重的错误修复！
+> 若要提出功能请求，请前往新项目 [CeciliaStudio/PCL.Mac.Refactor](https://github.com/CeciliaStudio/PCL.Mac.Refactor)。
 
 PCL.Mac 是使用 SwiftUI 框架重构的 [Plain Craft Launcher](https://github.com/Hex-Dragon/PCL2)，支持 macOS 平台。<br>
 支持与主线（PCL）和[社区版](https://github.com/PCL-Community/PCL2-CE)一样的游戏安装（原版、Forge、Fabric、NeoForge）、Mod 下载与游戏管理。<br>
